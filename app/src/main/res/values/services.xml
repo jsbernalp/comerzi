@@ -1,0 +1,3 @@
+<resources>
+    <string name="base_url">https://inventorysystem-production-737a.up.railway.app/api/</string>
+</resources>
