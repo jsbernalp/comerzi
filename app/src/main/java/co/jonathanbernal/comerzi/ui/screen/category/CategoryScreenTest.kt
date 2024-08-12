@@ -1,74 +1,56 @@
 package co.jonathanbernal.comerzi.ui.screen.category
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.ui.theme.ComerziTheme
-import co.jonathanbernal.comerzi.viewModels.CategoryViewModel
 
 @Composable
-fun CategoryScreen(categoryViewModel: CategoryViewModel) {
-    categoryViewModel.newCategoryName("")
-    categoryViewModel.getCategoryList()
+fun CategoryScreenTest() {
     ConstraintLayout(
         Modifier
-            .wrapContentSize()
-            .padding(5.dp)
+            .wrapContentHeight()
+            .padding(10.dp)
     ) {
         val (addCategory, listCategory) = createRefs()
         ElevatedCard(
             modifier = Modifier
                 .wrapContentHeight()
                 .padding(5.dp)
-                .constrainAs(listCategory) {
+                .constrainAs(addCategory) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    bottom.linkTo(addCategory.top)
+                    bottom.linkTo(listCategory.top)
                 },
             elevation = CardDefaults.cardElevation(
                 defaultElevation = 3.dp
             ),
         ) {
-            val sampleItems by categoryViewModel.categories.collectAsState()
-            ListCategory(sampleItems) { deleteCategory ->
-                categoryViewModel.deleteCategory(deleteCategory.id)
-            }
+            AddCategoryBoxTest()
         }
-
         ElevatedCard(
             modifier = Modifier
                 .wrapContentHeight()
                 .padding(5.dp)
-                .constrainAs(addCategory) {
-                    top.linkTo(listCategory.bottom)
+                .constrainAs(listCategory) {
+                    top.linkTo(addCategory.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom)
@@ -77,21 +59,24 @@ fun CategoryScreen(categoryViewModel: CategoryViewModel) {
                 defaultElevation = 3.dp
             ),
         ) {
-            AddCategoryBox(categoryViewModel)
+            val sampleItems = listOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5")
+            ListCategoryTest(sampleItems) { clickedItem ->
+                println("Clic en $clickedItem")
+            }
         }
     }
 }
 
 @Composable
-fun AddCategoryBox(categoryViewModel: CategoryViewModel) {
+fun AddCategoryBoxTest() {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
             .wrapContentHeight()
-            .padding(16.dp)
+            .padding(10.dp)
     ) {
-        ConstraintLayout {
-            val categoryValue by categoryViewModel.category.collectAsState()
+        ConstraintLayout(
+            Modifier.padding(10.dp)
+        ) {
             val (field, button) = createRefs()
             CustomTextField(
                 modifier = Modifier
@@ -103,25 +88,22 @@ fun AddCategoryBox(categoryViewModel: CategoryViewModel) {
                         bottom.linkTo(parent.bottom)
                         end.linkTo(button.absoluteLeft)
                     },
-                textFieldValue = categoryValue,
+                textFieldValue = "",
                 label = "Nombre de la categoria",
-                onValueChange = { newValue ->
-                    categoryViewModel.newCategoryName(newValue)
-                }
+                onValueChange = { }
             )
             Button(
                 modifier = Modifier
                     .wrapContentWidth()
                     .wrapContentHeight()
-                    .padding(PaddingValues(start = 10.dp))
                     .constrainAs(button) {
                         start.linkTo(field.end)
                         top.linkTo(parent.top)
                         end.linkTo(parent.absoluteRight)
                         bottom.linkTo(parent.bottom)
                     },
-                enabled = categoryViewModel.buttonEnabled.collectAsState().value,
-                onClick = { categoryViewModel.saveNewCategory() })
+                enabled = false,
+                onClick = { })
             {
                 Text(text = "+")
             }
@@ -130,7 +112,7 @@ fun AddCategoryBox(categoryViewModel: CategoryViewModel) {
 }
 
 @Composable
-fun CustomTextField(
+fun CustomTextFieldTest(
     modifier: Modifier = Modifier,
     textFieldValue: String,
     label: String,
@@ -145,38 +127,33 @@ fun CustomTextField(
 }
 
 @Composable
-fun ListCategory(itemsCategory: List<Category>, onDeleteClick: (Category) -> Unit) {
+fun ListCategoryTest(itemsCategory: List<String>, onItemClick: (String) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .wrapContentHeight()
             .padding(16.dp)
     ) {
         items(itemsCategory) { item ->
-            ItemRow(item, onDeleteClick = { onDeleteClick(item) })
+            ListItemTest(item, onItemClick)
         }
     }
 }
 
 @Composable
-fun ItemRow(item: Category, onDeleteClick: () -> Unit) {
-    Row(
+fun ListItemTest(item: String, onItemClick: (String) -> Unit) {
+    Text(
+        text = item,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text = item.name, style = MaterialTheme.typography.bodyLarge)
-        IconButton(onClick = onDeleteClick) {
-            Icon(Icons.Default.Delete, contentDescription = "Delete Item")
-        }
-    }
+            .padding(8.dp)
+            .clickable { onItemClick(item) }
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun DefaultPreviewTest() {
     ComerziTheme {
-        // CategoryScreen(categoryViewModel)
+        CategoryScreenTest()
     }
 }

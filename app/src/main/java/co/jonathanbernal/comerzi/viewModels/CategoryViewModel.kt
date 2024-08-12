@@ -1,7 +1,9 @@
 package co.jonathanbernal.comerzi.viewModels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.useCases.CategoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -24,18 +26,46 @@ class CategoryViewModel @Inject constructor(
     private val _category = MutableStateFlow("")
     val category: StateFlow<String> = _category.asStateFlow()
 
+    private val _categories = MutableStateFlow(listOf<Category>())
+    val categories: StateFlow<List<Category>> = _categories.asStateFlow()
+
     fun newCategoryName(value: String) {
         _category.value = value
     }
 
+    fun getCategoryList() {
+        viewModelScope.launch {
+            val result = categoryUseCase.getCategories()
+            result.fold(
+                onSuccess = { _categories.value = it },
+                onFailure = { Log.e(this.javaClass.simpleName, "Error ${it.message}") }
+            )
+        }
+    }
+
     fun saveNewCategory() {
         viewModelScope.launch {
-            runCatching {
-                val result = categoryUseCase.saveNewCategory(category.value)
-                if (result != null) {
+            val result = categoryUseCase.saveNewCategory(category.value)
+            result.fold(
+                onSuccess = {
                     newCategoryName("")
+                    getCategoryList()
+                },
+                onFailure = {
+                    newCategoryName("")
+                    Log.e(this.javaClass.simpleName, "Error ${it.message}")
                 }
-            }
+            )
+        }
+    }
+
+    fun deleteCategory(id: String) {
+        viewModelScope.launch {
+            val result = categoryUseCase.deleteCategory(id)
+            result.fold(
+                onSuccess = { getCategoryList() },
+                onFailure = { Log.e(this.javaClass.simpleName, "Error ${it.message}") }
+            )
         }
     }
 

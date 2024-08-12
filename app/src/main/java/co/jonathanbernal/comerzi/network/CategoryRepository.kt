@@ -9,8 +9,16 @@ class CategoryRepository @Inject constructor(
     private val categoryApi: CategoryApi
 ){
 
-    suspend fun saveNewCategory(requestCategory: RequestCategory): ResponseCategory {
+    suspend fun saveNewCategory(requestCategory: RequestCategory): Result<Unit> {
       return categoryApi.saveCategory(requestCategory)
+    }
+
+    suspend fun deleteCategory(id: String): Result<Unit> {
+        return categoryApi.deleteCategory(id)
+    }
+
+    suspend fun getCategories(): Result<List<ResponseCategory>> {
+        return categoryApi.getCategories()
     }
 
 }
