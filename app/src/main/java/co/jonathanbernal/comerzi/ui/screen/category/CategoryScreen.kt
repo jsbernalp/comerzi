@@ -1,9 +1,10 @@
 package co.jonathanbernal.comerzi.ui.screen.category
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -26,9 +27,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.ui.theme.ComerziTheme
 import co.jonathanbernal.comerzi.viewModels.CategoryViewModel
@@ -37,94 +38,103 @@ import co.jonathanbernal.comerzi.viewModels.CategoryViewModel
 fun CategoryScreen(categoryViewModel: CategoryViewModel) {
     categoryViewModel.newCategoryName("")
     categoryViewModel.getCategoryList()
-    ConstraintLayout(
+    Column(
         Modifier
-            .wrapContentSize()
-            .padding(5.dp)
+            .fillMaxSize()
+            .padding(10.dp),
     ) {
-        val (addCategory, listCategory) = createRefs()
-        ElevatedCard(
+        Column(
             modifier = Modifier
+                .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(5.dp)
-                .constrainAs(listCategory) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(addCategory.top)
-                },
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 3.dp
-            ),
+                .weight(5f),
         ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .weight(1f),
+                text = "Categorias Actuales",
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center
+            )
             val sampleItems by categoryViewModel.categories.collectAsState()
-            ListCategory(sampleItems) { deleteCategory ->
+            ListCategory(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .weight(8f)
+                    .padding(16.dp),
+                sampleItems
+            ) { deleteCategory ->
                 categoryViewModel.deleteCategory(deleteCategory.id)
             }
         }
 
         ElevatedCard(
             modifier = Modifier
+                .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(5.dp)
-                .constrainAs(addCategory) {
-                    top.linkTo(listCategory.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                },
+                .weight(1f),
             elevation = CardDefaults.cardElevation(
                 defaultElevation = 3.dp
             ),
         ) {
-            AddCategoryBox(categoryViewModel)
+            Column(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(vertical = 16.dp),
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    text = "Deseas agregar una nueva categoria?",
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center
+                )
+                AddCategoryBox(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(vertical = 10.dp, horizontal = 16.dp),
+                    categoryViewModel = categoryViewModel
+                )
+            }
         }
     }
 }
 
 @Composable
-fun AddCategoryBox(categoryViewModel: CategoryViewModel) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(16.dp)
+fun AddCategoryBox(modifier: Modifier, categoryViewModel: CategoryViewModel) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        ConstraintLayout {
-            val categoryValue by categoryViewModel.category.collectAsState()
-            val (field, button) = createRefs()
-            CustomTextField(
-                modifier = Modifier
-                    .padding(PaddingValues(end = 10.dp))
-                    .wrapContentHeight()
-                    .constrainAs(field) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        bottom.linkTo(parent.bottom)
-                        end.linkTo(button.absoluteLeft)
-                    },
-                textFieldValue = categoryValue,
-                label = "Nombre de la categoria",
-                onValueChange = { newValue ->
-                    categoryViewModel.newCategoryName(newValue)
-                }
-            )
-            Button(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight()
-                    .padding(PaddingValues(start = 10.dp))
-                    .constrainAs(button) {
-                        start.linkTo(field.end)
-                        top.linkTo(parent.top)
-                        end.linkTo(parent.absoluteRight)
-                        bottom.linkTo(parent.bottom)
-                    },
-                enabled = categoryViewModel.buttonEnabled.collectAsState().value,
-                onClick = { categoryViewModel.saveNewCategory() })
-            {
-                Text(text = "+")
+        val categoryValue by categoryViewModel.category.collectAsState()
+        CustomTextField(
+            modifier = Modifier
+                .padding(PaddingValues(end = 10.dp))
+                .wrapContentHeight()
+                .weight(3f),
+            textFieldValue = categoryValue,
+            label = "Nombre de la categoria",
+            onValueChange = { newValue ->
+                categoryViewModel.newCategoryName(newValue)
             }
+        )
+        Button(
+            modifier = Modifier
+                .wrapContentWidth()
+                .wrapContentHeight()
+                .padding(PaddingValues(start = 10.dp))
+                .weight(1f),
+            enabled = categoryViewModel.buttonEnabled.collectAsState().value,
+            onClick = { categoryViewModel.saveNewCategory() })
+        {
+            Text(text = "+")
         }
     }
 }
@@ -145,11 +155,13 @@ fun CustomTextField(
 }
 
 @Composable
-fun ListCategory(itemsCategory: List<Category>, onDeleteClick: (Category) -> Unit) {
+fun ListCategory(
+    modifier: Modifier,
+    itemsCategory: List<Category>,
+    onDeleteClick: (Category) -> Unit
+) {
     LazyColumn(
-        modifier = Modifier
-            .wrapContentHeight()
-            .padding(16.dp)
+        modifier = modifier
     ) {
         items(itemsCategory) { item ->
             ItemRow(item, onDeleteClick = { onDeleteClick(item) })
@@ -166,7 +178,11 @@ fun ItemRow(item: Category, onDeleteClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = item.name, style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = item.name,
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Justify,
+        )
         IconButton(onClick = onDeleteClick) {
             Icon(Icons.Default.Delete, contentDescription = "Delete Item")
         }
