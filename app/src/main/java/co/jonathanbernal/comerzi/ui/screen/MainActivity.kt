@@ -5,105 +5,135 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.ConstraintLayoutScope
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import co.jonathanbernal.comerzi.ui.screen.category.CategoryScreen
-import co.jonathanbernal.comerzi.ui.theme.ComerziTheme
-import co.jonathanbernal.comerzi.viewModels.CategoryViewModel
+import co.jonathanbernal.comerzi.ui.screen.product.AddProductScreen
+import co.jonathanbernal.comerzi.ui.screen.product.ProductScreen
+import co.jonathanbernal.comerzi.ui.theme.Purple40
+import co.jonathanbernal.comerzi.viewModels.category.CategoryViewModel
+import co.jonathanbernal.comerzi.viewModels.product.AddProductViewModel
+import co.jonathanbernal.comerzi.viewModels.product.ProductViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val categoryViewModel: CategoryViewModel by viewModels()
-    private lateinit var navController: NavHostController
+    private val productViewModel: ProductViewModel by viewModels()
+    private val addProductViewModel: AddProductViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ComerziTheme {
-                navController = rememberNavController()
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize()
-                    ) { _ ->
-                        NavController(categoryViewModel, navController)
-                    }
-                }
-            }
+            ViewContainer()
         }
+    }
+
+    @Composable
+    private fun ViewContainer() {
+        val navController = rememberNavController()
+        Scaffold(
+            content = { innerPadding ->
+                NavController(
+                    addProductViewModel,
+                    productViewModel,
+                    categoryViewModel,
+                    navController,
+                    innerPadding
+                )
+            },
+            bottomBar = {
+                BottomNavigationBar(navController)
+            }
+        )
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Preview
+    @Composable
+    fun Toolbar() {
+        TopAppBar(
+            title = {
+                Text(text = "Comerzi")
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Purple40,
+                titleContentColor = Color.White
+            )
+        )
     }
 }
 
 @Composable
-fun NavController(categoryViewModel: CategoryViewModel, navController: NavHostController) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        NavHost(navController = navController, startDestination = "home") {
-            composable("home") {
-                HomeContent(navController)
-            }
-            composable("category") {
-                CategoryScreen(categoryViewModel)
-            }
-        }
-    }
-}
-
-@Composable
-private fun HomeContent(navController: NavHostController) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceEvenly,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ConstraintLayout(Modifier.fillMaxSize()) {
-            Greeting(this, navController)
-        }
-    }
-}
-
-@Composable
-fun Greeting(
-    parentConstraint: ConstraintLayoutScope,
-    navController: NavHostController
+fun NavController(
+    addProductViewModel: AddProductViewModel,
+    productViewModel: ProductViewModel,
+    categoryViewModel: CategoryViewModel,
+    navController: NavHostController,
+    innerPadding: PaddingValues
 ) {
-    parentConstraint.apply {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Button(
-                modifier = Modifier.padding(8.dp),
-                onClick = { navController.navigate("category") },
-            ) {
-                Text(text = "Administrar Categorias".trimIndent())
+    NavHost(navController = navController, startDestination = NavItem.Home.route) {
+        composable(NavItem.Home.route) {
+            ProductScreen(
+                productViewModel = productViewModel,
+                navController = navController,
+                innerPadding
+            )
+        }
+        composable(NavItem.Category.route) {
+            CategoryScreen(categoryViewModel, innerPadding)
+        }
+        composable("addProduct") {
+            AddProductScreen(addProductViewModel, navController, innerPadding)
+        }
+    }
+}
+
+@Composable
+fun BottomNavigationBar(navController: NavHostController) {
+    val items = listOf(NavItem.Home, NavItem.Category)
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
+    BottomAppBar {
+        NavigationBar {
+            items.forEach { item ->
+                NavigationBarItem(
+                    selected = currentRoute == item.route,
+                    onClick = {
+                        navController.navigate(item.route) {
+                            navController.graph.startDestinationRoute?.let { route ->
+                                popUpTo(route) {
+                                    saveState = true
+                                }
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    label = { Text(text = item.title) },
+                    icon = {
+                        Icon(painterResource(id = item.icon), contentDescription = item.title)
+                    })
             }
         }
     }

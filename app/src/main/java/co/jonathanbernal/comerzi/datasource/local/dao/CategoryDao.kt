@@ -9,7 +9,7 @@ import co.jonathanbernal.comerzi.datasource.local.models.CategoryTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface CategoryDatabaseDao {
+interface CategoryDao {
 
     @Query("SELECT * from categoryTable")
     fun getAllCategories(): Flow<List<CategoryTable>>
@@ -17,7 +17,10 @@ interface CategoryDatabaseDao {
     @Query("SELECT * from categoryTable WHERE id = :id")
     suspend fun getCategoryById(id: Int): CategoryTable
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Query("SELECT * from categoryTable WHERE name = :name")
+    suspend fun getCategoryByName(name: String): CategoryTable?
+
+    @Insert
     suspend fun insertCategory(categoryTable: CategoryTable)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)

@@ -1,8 +1,7 @@
 package co.jonathanbernal.comerzi.datasource
 
-import co.jonathanbernal.comerzi.datasource.local.dao.CategoryDatabaseDao
+import co.jonathanbernal.comerzi.datasource.local.dao.CategoryDao
 import co.jonathanbernal.comerzi.datasource.local.models.CategoryTable
-import co.jonathanbernal.comerzi.datasource.network.api.CategoryApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
@@ -10,20 +9,27 @@ import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class CategoryRepository @Inject constructor(
-    private val categoryApi: CategoryApi,
-    private val categoryDatabaseDao: CategoryDatabaseDao
+    private val categoryDao: CategoryDao
 ) {
 
-    suspend fun addCategory(category: CategoryTable) = categoryDatabaseDao.insertCategory(category)
+    suspend fun addCategory(category: CategoryTable): Result<Unit> {
+        val isExist = categoryDao.getCategoryByName(category.name)
+        return isExist?.let {
+            Result.failure(Exception("Category already exists"))
+        } ?: run {
+            Result.success(categoryDao.insertCategory(category))
+        }
+    }
+
     suspend fun updateCategory(category: CategoryTable) =
-        categoryDatabaseDao.updateCategory(category)
+        categoryDao.updateCategory(category)
 
     suspend fun deleteCategoryFromDb(id: Int) =
-        categoryDatabaseDao.deleteCategory(id)
+        categoryDao.deleteCategory(id)
 
-    suspend fun deleteAllCategories() = categoryDatabaseDao.deleteAllCategories()
+    suspend fun deleteAllCategories() = categoryDao.deleteAllCategories()
 
     fun getAllCategories(): Flow<List<CategoryTable>> =
-        categoryDatabaseDao.getAllCategories().flowOn(Dispatchers.IO).conflate()
+        categoryDao.getAllCategories().flowOn(Dispatchers.IO).conflate()
 
 }

@@ -18,13 +18,11 @@ class CategoryUseCase @Inject constructor(
         }
     }
 
-    suspend fun addCategory(categoryName: String) {
-        categoryRepository.addCategory(CategoryTable(name = categoryName))
+    suspend fun addCategory(categoryName: String): Result<Unit> {
+        return categoryRepository.addCategory(CategoryTable(name = categoryName.uppercase()))
     }
 
     suspend fun deleteCategoryFromDb(id: Int) {
         categoryRepository.deleteCategoryFromDb(id)
     }
-
-
 }

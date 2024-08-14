@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -124,6 +125,7 @@ fun CategoryScreenTest() {
 
 @Composable
 fun AddCategoryBoxTest(modifier: Modifier) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -136,7 +138,8 @@ fun AddCategoryBoxTest(modifier: Modifier) {
                 .weight(3f),
             textFieldValue = "",
             label = "Nombre de la categoria",
-            onValueChange = { }
+            onValueChange = { },
+            keyboardController
         )
         Button(
             modifier = Modifier

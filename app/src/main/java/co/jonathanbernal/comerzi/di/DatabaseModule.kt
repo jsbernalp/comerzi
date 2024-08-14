@@ -25,5 +25,9 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideCategoryDao(comerziDatabase: ComerziDatabase) = comerziDatabase.categoryDatabaseDao()
+    fun provideCategoryDao(comerziDatabase: ComerziDatabase) = comerziDatabase.categoryDao()
+
+    @Provides
+    @Singleton
+    fun provideProductDao(comerziDatabase: ComerziDatabase) = comerziDatabase.productDao()
 }

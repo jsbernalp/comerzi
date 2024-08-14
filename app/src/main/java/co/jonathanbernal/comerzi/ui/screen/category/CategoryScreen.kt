@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
@@ -27,28 +29,31 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.ui.theme.ComerziTheme
-import co.jonathanbernal.comerzi.viewModels.CategoryViewModel
+import co.jonathanbernal.comerzi.viewModels.category.CategoryViewModel
 
 @Composable
-fun CategoryScreen(categoryViewModel: CategoryViewModel) {
+fun CategoryScreen(categoryViewModel: CategoryViewModel, innerPadding: PaddingValues) {
     categoryViewModel.newCategoryName("")
     categoryViewModel.getAllCategories()
+    val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         Modifier
             .fillMaxSize()
-            .padding(10.dp),
+            .padding(innerPadding),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
                 .padding(5.dp)
-                .weight(5f),
+                .weight(4f),
         ) {
             Text(
                 modifier = Modifier
@@ -62,7 +67,6 @@ fun CategoryScreen(categoryViewModel: CategoryViewModel) {
             val sampleItems by categoryViewModel.categories.collectAsState()
             ListCategory(
                 modifier = Modifier
-                    .wrapContentHeight()
                     .weight(8f)
                     .padding(16.dp),
                 sampleItems
@@ -98,8 +102,9 @@ fun CategoryScreen(categoryViewModel: CategoryViewModel) {
                 AddCategoryBox(
                     modifier = Modifier
                         .wrapContentSize()
-                        .padding(vertical = 10.dp, horizontal = 16.dp),
-                    categoryViewModel = categoryViewModel
+                        .padding(vertical = 5.dp, horizontal = 16.dp),
+                    categoryViewModel = categoryViewModel,
+                    keyboardController
                 )
             }
         }
@@ -107,7 +112,11 @@ fun CategoryScreen(categoryViewModel: CategoryViewModel) {
 }
 
 @Composable
-fun AddCategoryBox(modifier: Modifier, categoryViewModel: CategoryViewModel) {
+fun AddCategoryBox(
+    modifier: Modifier,
+    categoryViewModel: CategoryViewModel,
+    keyboardController: SoftwareKeyboardController?
+) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -123,7 +132,8 @@ fun AddCategoryBox(modifier: Modifier, categoryViewModel: CategoryViewModel) {
             label = "Nombre de la categoria",
             onValueChange = { newValue ->
                 categoryViewModel.newCategoryName(newValue)
-            }
+            },
+            keyboardController
         )
         Button(
             modifier = Modifier
@@ -145,12 +155,15 @@ fun CustomTextField(
     textFieldValue: String,
     label: String,
     onValueChange: (String) -> Unit = { },
+    keyboardController: SoftwareKeyboardController?
 ) {
     OutlinedTextField(
         modifier = modifier,
         value = textFieldValue,
         onValueChange = { newText -> onValueChange(newText) },
         label = { Text(text = label) },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
     )
 }
 
@@ -161,7 +174,8 @@ fun ListCategory(
     onDeleteClick: (Category) -> Unit
 ) {
     LazyColumn(
-        modifier = modifier
+        modifier = modifier,
+        verticalArrangement = Arrangement.Top
     ) {
         items(itemsCategory) { item ->
             ItemRow(item, onDeleteClick = { onDeleteClick(item) })
