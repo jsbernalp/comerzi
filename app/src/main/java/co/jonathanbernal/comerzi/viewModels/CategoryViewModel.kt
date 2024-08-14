@@ -1,12 +1,12 @@
 package co.jonathanbernal.comerzi.viewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.useCases.CategoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,42 +34,27 @@ class CategoryViewModel @Inject constructor(
         _category.value = value
     }
 
-    fun getCategoryList() {
-        viewModelScope.launch {
-            val result = categoryUseCase.getCategories()
-            result.fold(
-                onSuccess = { _categories.value = it },
-                onFailure = { Log.e(this.javaClass.simpleName, "Error ${it.message}") }
-            )
-        }
-    }
-
-    fun saveNewCategory() {
-        viewModelScope.launch {
-            val result = categoryUseCase.saveNewCategory(category.value)
-            result.fold(
-                onSuccess = {
-                    newCategoryName("")
-                    getCategoryList()
-                },
-                onFailure = {
-                    newCategoryName("")
-                    Log.e(this.javaClass.simpleName, "Error ${it.message}")
+    fun getAllCategories() {
+        viewModelScope.launch(Dispatchers.IO) {
+            categoryUseCase.getAllCategories().distinctUntilChanged()
+                .collect { listOfCategories ->
+                    _categories.value = listOfCategories
                 }
-            )
         }
     }
 
-    fun deleteCategory(id: String) {
+    fun addCategory() {
         viewModelScope.launch {
-            val result = categoryUseCase.deleteCategory(id)
-            result.fold(
-                onSuccess = { getCategoryList() },
-                onFailure = { Log.e(this.javaClass.simpleName, "Error ${it.message}") }
-            )
+            categoryUseCase.addCategory(_category.value)
+            newCategoryName("")
         }
     }
 
+    fun deleteCategory(id: Int) {
+        viewModelScope.launch {
+            categoryUseCase.deleteCategoryFromDb(id)
+        }
+    }
 
     val buttonEnabled: StateFlow<Boolean> =
         combine(

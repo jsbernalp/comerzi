@@ -1,6 +1,6 @@
-package co.jonathanbernal.comerzi.network.mappers
+package co.jonathanbernal.comerzi.datasource.network.mappers
 
-import co.jonathanbernal.comerzi.network.models.ResponseCategory
+import co.jonathanbernal.comerzi.datasource.network.models.ResponseCategory
 import co.jonathanbernal.comerzi.ui.models.Category
 
 fun List<ResponseCategory>.toCategories(): List<Category> {

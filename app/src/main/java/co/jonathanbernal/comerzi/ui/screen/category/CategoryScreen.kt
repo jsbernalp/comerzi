@@ -37,7 +37,7 @@ import co.jonathanbernal.comerzi.viewModels.CategoryViewModel
 @Composable
 fun CategoryScreen(categoryViewModel: CategoryViewModel) {
     categoryViewModel.newCategoryName("")
-    categoryViewModel.getCategoryList()
+    categoryViewModel.getAllCategories()
     Column(
         Modifier
             .fillMaxSize()
@@ -132,7 +132,7 @@ fun AddCategoryBox(modifier: Modifier, categoryViewModel: CategoryViewModel) {
                 .padding(PaddingValues(start = 10.dp))
                 .weight(1f),
             enabled = categoryViewModel.buttonEnabled.collectAsState().value,
-            onClick = { categoryViewModel.saveNewCategory() })
+            onClick = { categoryViewModel.addCategory() })
         {
             Text(text = "+")
         }

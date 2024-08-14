@@ -1,6 +1,6 @@
 package co.jonathanbernal.comerzi.di
 
-import co.jonathanbernal.comerzi.network.services.CategoryServices
+import co.jonathanbernal.comerzi.datasource.network.services.CategoryServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

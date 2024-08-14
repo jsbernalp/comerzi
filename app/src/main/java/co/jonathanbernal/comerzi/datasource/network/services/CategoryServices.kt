@@ -1,7 +1,7 @@
-package co.jonathanbernal.comerzi.network.services
+package co.jonathanbernal.comerzi.datasource.network.services
 
-import co.jonathanbernal.comerzi.network.models.RequestCategory
-import co.jonathanbernal.comerzi.network.models.ResponseCategory
+import co.jonathanbernal.comerzi.datasource.network.models.RequestCategory
+import co.jonathanbernal.comerzi.datasource.network.models.ResponseCategory
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -18,7 +18,7 @@ interface CategoryServices {
 
     @DELETE("categories/{id}")
     suspend fun deleteCategory(
-        @Path("id") id: String
+        @Path("id") id: Int
     ): Response<Unit>
 
     @GET("categories")
