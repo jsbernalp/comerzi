@@ -18,7 +18,7 @@ interface ProductDao {
     @Insert
     suspend fun insertProduct(productTable: ProductTable)
 
-    @Query("DELETE from productTable WHERE id = :id")
+    @Query("DELETE from productTable WHERE idProduct = :id")
     suspend fun deleteProduct(id: Int)
 
     @Query("DELETE from productTable")

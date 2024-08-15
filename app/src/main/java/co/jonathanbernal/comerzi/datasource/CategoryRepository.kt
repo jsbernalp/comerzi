@@ -13,7 +13,7 @@ class CategoryRepository @Inject constructor(
 ) {
 
     suspend fun addCategory(category: CategoryTable): Result<Unit> {
-        val isExist = categoryDao.getCategoryByName(category.name)
+        val isExist = categoryDao.getCategoryByName(category.categoryName)
         return isExist?.let {
             Result.failure(Exception("Category already exists"))
         } ?: run {

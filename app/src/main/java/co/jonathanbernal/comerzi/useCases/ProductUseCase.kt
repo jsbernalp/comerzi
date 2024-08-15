@@ -1,8 +1,9 @@
 package co.jonathanbernal.comerzi.useCases
 
 import co.jonathanbernal.comerzi.datasource.ProductRepository
-import co.jonathanbernal.comerzi.datasource.local.mapper.toProduct
-import co.jonathanbernal.comerzi.datasource.local.models.ProductTable
+import co.jonathanbernal.comerzi.datasource.local.mapper.toProductTable
+import co.jonathanbernal.comerzi.datasource.local.mapper.toProducts
+import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.ui.models.Product
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -12,22 +13,49 @@ class ProductUseCase @Inject constructor(
     private val productRepository: ProductRepository
 ) {
 
-    suspend fun addProduct(product: Product): Result<Unit> {
-        val isExist = productRepository.getProductByEan(product.ean)
-        return isExist?.let {
-            Result.failure(Exception("Product already exists"))
+    suspend fun addProduct(
+        name: String,
+        ean: String,
+        price: Double,
+        category: Category?
+    ): Result<Unit> {
+        category?.let { categoryValue ->
+            val isExist = productRepository.getProductByEan(ean)
+            return isExist?.let {
+                Result.failure(Exception("Product already exists"))
+            } ?: run {
+                Result.success(
+                    productRepository.addProduct(
+                        getProduct(
+                            name,
+                            ean,
+                            price,
+                            categoryValue
+                        ).toProductTable()
+                    )
+                )
+            }
         } ?: run {
-            Result.success(productRepository.addProduct(product.toProductTable()))
+            return Result.failure(Exception("Category is required"))
         }
     }
 
-    fun getAllProducts(): Flow<List<Product>> = productRepository.getAllProducts().map { list ->
-        list.map { it.toProduct() }
-    }
+    fun getAllProducts(): Flow<List<Product>> =
+        productRepository.getAllProducts().map { list ->
+            list.toProducts()
+        }
 
-    private fun Product.toProductTable() = ProductTable(
-        name = name,
-        ean = ean,
-        price = price
-    )
+    private fun getProduct(
+        name: String,
+        ean: String,
+        price: Double,
+        categoryValue: Category
+    ): Product {
+        return Product(
+            name = name,
+            ean = ean,
+            price = price,
+            category = categoryValue
+        )
+    }
 }

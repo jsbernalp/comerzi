@@ -9,5 +9,13 @@ fun List<ProductTable>.toProducts(): List<Product> =
 fun ProductTable.toProduct() = Product(
     name = name,
     ean = ean,
-    price = price
+    price = price,
+    category = category.toCategory()
+)
+
+fun Product.toProductTable() = ProductTable(
+    name = name,
+    ean = ean,
+    price = price,
+    category = category.toCategoryTable()
 )

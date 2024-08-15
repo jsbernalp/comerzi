@@ -8,7 +8,7 @@ import java.util.Date
 @Entity(tableName = "categoryTable")
 data class CategoryTable(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val name: String,
+    val idCategory: Int = 0,
+    val categoryName: String,
     val date: Date = Date.from(Instant.now())
 )

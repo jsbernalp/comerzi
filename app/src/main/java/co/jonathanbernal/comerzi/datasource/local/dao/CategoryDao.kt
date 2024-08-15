@@ -14,10 +14,10 @@ interface CategoryDao {
     @Query("SELECT * from categoryTable")
     fun getAllCategories(): Flow<List<CategoryTable>>
 
-    @Query("SELECT * from categoryTable WHERE id = :id")
+    @Query("SELECT * from categoryTable WHERE idCategory = :id")
     suspend fun getCategoryById(id: Int): CategoryTable
 
-    @Query("SELECT * from categoryTable WHERE name = :name")
+    @Query("SELECT * from categoryTable WHERE categoryName = :name")
     suspend fun getCategoryByName(name: String): CategoryTable?
 
     @Insert
@@ -26,7 +26,7 @@ interface CategoryDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateCategory(categoryTable: CategoryTable)
 
-    @Query("DELETE from categoryTable WHERE id = :id")
+    @Query("DELETE from categoryTable WHERE idCategory = :id")
     suspend fun deleteCategory(id: Int)
 
     @Query("DELETE from categoryTable")

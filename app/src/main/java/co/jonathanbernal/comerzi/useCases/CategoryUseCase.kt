@@ -19,7 +19,7 @@ class CategoryUseCase @Inject constructor(
     }
 
     suspend fun addCategory(categoryName: String): Result<Unit> {
-        return categoryRepository.addCategory(CategoryTable(name = categoryName.uppercase()))
+        return categoryRepository.addCategory(CategoryTable(categoryName = categoryName.uppercase()))
     }
 
     suspend fun deleteCategoryFromDb(id: Int) {

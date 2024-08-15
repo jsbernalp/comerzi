@@ -24,6 +24,7 @@ class ProductViewModel @Inject constructor(
         viewModelScope.launch {
             productUseCase.getAllProducts().distinctUntilChanged()
                 .collect { productList ->
+                    _products.value = emptyList()
                     _products.value = productList
                 }
         }

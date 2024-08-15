@@ -10,8 +10,16 @@ fun List<CategoryTable>.toCategories(): List<Category> {
 
 fun CategoryTable.toCategory(): Category {
     return Category(
-        id = this.id,
-        name = this.name,
+        id = this.idCategory,
+        name = this.categoryName,
         date = this.date
+    )
+}
+
+
+fun Category.toCategoryTable(): CategoryTable {
+    return CategoryTable(
+        idCategory = this.id,
+        categoryName = this.name,
     )
 }
