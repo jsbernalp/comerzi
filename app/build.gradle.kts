@@ -110,4 +110,8 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+
+    //Scanner
+
+    implementation (libs.play.services.code.scanner)
 }

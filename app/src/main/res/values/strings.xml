@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Comerzi</string>
+    <string name="nav_product_item">Productos</string>
+    <string name="nav_category_item">Categorías</string>
+    <string name="label_product_name_card">Producto</string>
+    <string name="label_product_price_card">Precio</string>
+    <string name="label_product_ean_card">EAN</string>
+    <string name="label_product_category_card">Categoría</string>
+    <string name="add_product_button_label">Agregar Producto</string>
+    <string name="add_product_screen_title">Agregar Producto</string>
+    <string name="save_product_button_label">Guardar</string>
+    <string name="name_product_form_label">Ingrese el nombre</string>
+    <string name="code_product_form_label">Ingrese el código de barras</string>
+    <string name="code_product_button_form_label">o Escanea aquí el código de barras</string>
+    <string name="price_product_form_label">Ingrese el precio</string>
+    <string name="category_product_form_label">Seleccione la categoría</string>
+    <string name="warning_category_form_label">No olvides agregar categorías antes de agregar un producto</string>
 </resources>

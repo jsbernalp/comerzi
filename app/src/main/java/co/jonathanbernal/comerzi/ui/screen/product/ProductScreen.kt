@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,7 @@ import androidx.navigation.NavController
 import co.jonathanbernal.comerzi.R
 import co.jonathanbernal.comerzi.ui.models.Product
 import co.jonathanbernal.comerzi.viewModels.product.ProductViewModel
+import java.math.BigDecimal
 
 
 @Composable
@@ -62,8 +64,13 @@ fun ProductScreen(
 fun AddProduct(navController: NavController) {
     ExtendedFloatingActionButton(
         onClick = { navController.navigate("addProduct") },
-        icon = { Icon(Icons.Default.Add, contentDescription = "Add Product") },
-        text = { Text(text = "Agregar Producto") },
+        icon = {
+            Icon(
+                Icons.Default.Add,
+                contentDescription = stringResource(id = R.string.add_product_button_label)
+            )
+        },
+        text = { Text(text = stringResource(id = R.string.add_product_button_label)) },
     )
 }
 
@@ -134,13 +141,13 @@ fun ItemProduct(item: Product, onDeleteClick: () -> Unit) {
                 ) {
                     TextWithLabel(
                         horizontalAlignment = Alignment.Start,
-                        labelValue = "Producto",
+                        labelValue = stringResource(id = R.string.label_product_name_card),
                         textValue = item.name
                     )
                     TextWithLabel(
                         horizontalAlignment = Alignment.End,
-                        labelValue = "Precio",
-                        textValue = item.price.toString()
+                        labelValue = stringResource(id = R.string.label_product_price_card),
+                        textValue = BigDecimal(item.price).toString()
                     )
                 }
 
@@ -152,12 +159,12 @@ fun ItemProduct(item: Product, onDeleteClick: () -> Unit) {
                 ) {
                     TextWithLabel(
                         horizontalAlignment = Alignment.Start,
-                        labelValue = "EAN",
+                        labelValue = stringResource(id = R.string.label_product_ean_card),
                         textValue = item.ean
                     )
                     TextWithLabel(
                         horizontalAlignment = Alignment.End,
-                        labelValue = "Categoria",
+                        labelValue = stringResource(id = R.string.label_product_category_card),
                         textValue = item.category.name
                     )
                 }

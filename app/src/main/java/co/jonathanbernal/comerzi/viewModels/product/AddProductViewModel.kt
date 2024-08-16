@@ -1,11 +1,14 @@
 package co.jonathanbernal.comerzi.viewModels.product
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.useCases.CategoryUseCase
 import co.jonathanbernal.comerzi.useCases.ProductUseCase
+import co.jonathanbernal.comerzi.utils.orEmpty
 import co.jonathanbernal.comerzi.utils.toStateFlow
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanner
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope.coroutineContext
@@ -23,7 +26,8 @@ enum class FieldType {
 @HiltViewModel
 class AddProductViewModel @Inject constructor(
     private val productUseCase: ProductUseCase,
-    private val categoryUseCase: CategoryUseCase
+    private val categoryUseCase: CategoryUseCase,
+    private val scanner: GmsBarcodeScanner
 ) : ViewModel() {
 
     private val _productName = MutableStateFlow("")
@@ -80,6 +84,16 @@ class AddProductViewModel @Inject constructor(
                 onFailure = {}
             )
         }
+    }
+
+    fun openScanner() {
+        scanner.startScan()
+            .addOnSuccessListener { barcode ->
+                updateProductData(barcode.displayValue.orEmpty(), FieldType.EAN)
+            }
+            .addOnFailureListener { e ->
+                Log.e("Scanner", e.message.orEmpty())
+            }
     }
 
     val buttonEnabled: StateFlow<Boolean> =

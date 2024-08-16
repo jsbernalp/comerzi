@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
@@ -20,10 +21,14 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,6 +45,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,25 +53,66 @@ import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
 import co.jonathanbernal.comerzi.R
 import co.jonathanbernal.comerzi.ui.screen.category.CustomTextField
+import co.jonathanbernal.comerzi.ui.screen.common.TopBarText
 import co.jonathanbernal.comerzi.utils.orEmpty
 import co.jonathanbernal.comerzi.viewModels.product.AddProductViewModel
 import co.jonathanbernal.comerzi.viewModels.product.FieldType
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddProductScreen(
-    productViewModel: AddProductViewModel,
+    addProductViewModel: AddProductViewModel,
     navController: NavController,
     innerPadding: PaddingValues
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    productViewModel.getCategories()
-    FormProduct(productViewModel, navController, innerPadding, keyboardController)
+    addProductViewModel.getCategories()
+    Scaffold(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(innerPadding),
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "back"
+                        )
+                    }
+                },
+                title = {
+                    TopBarText(text = stringResource(id = R.string.add_product_screen_title))
+                },
+            )
+        },
+        content = { contentInnerPadding ->
+            FormProduct(addProductViewModel, contentInnerPadding, keyboardController)
+        },
+        bottomBar = {
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
+                enabled = addProductViewModel.buttonEnabled.collectAsState().value,
+                onClick = {
+                    addProductViewModel.saveProduct {
+                        navController.popBackStack()
+                    }
+                }) {
+                Text(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    text = stringResource(id = R.string.save_product_button_label)
+                )
+            }
+        }
+    )
 }
 
 @Composable
 fun FormProduct(
     addProductViewModel: AddProductViewModel,
-    navController: NavController,
     innerPadding: PaddingValues,
     keyboardController: SoftwareKeyboardController?
 ) {
@@ -73,24 +120,16 @@ fun FormProduct(
         modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)
-            .padding(vertical = 32.dp, horizontal = 16.dp)
+            .padding(horizontal = 16.dp)
     ) {
         val productNameValue by addProductViewModel.productName.collectAsState()
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = "Agregar Producto",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center
-        )
         Spacer(modifier = Modifier.height(16.dp))
         CustomTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
             textFieldValue = productNameValue,
-            label = "Nombre del producto",
+            label = stringResource(id = R.string.name_product_form_label),
             onValueChange = { newValue ->
                 addProductViewModel.updateProductData(newValue, FieldType.NAME)
             },
@@ -103,12 +142,20 @@ fun FormProduct(
                 .fillMaxWidth()
                 .wrapContentHeight(),
             textFieldValue = productEanValue,
-            label = "Codigo de barras del producto",
+            label = stringResource(id = R.string.code_product_form_label),
             onValueChange = { newValue ->
                 addProductViewModel.updateProductData(newValue, FieldType.EAN)
             },
             keyboardController
         )
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                addProductViewModel.openScanner()
+            }) {
+            Text(text = stringResource(id = R.string.code_product_button_form_label))
+        }
+
         val productPriceValue by addProductViewModel.productPrice.collectAsState()
         Spacer(modifier = Modifier.height(16.dp))
         CustomTextField(
@@ -116,7 +163,7 @@ fun FormProduct(
                 .fillMaxWidth()
                 .wrapContentHeight(),
             textFieldValue = productPriceValue,
-            label = "Precio del producto",
+            label = stringResource(id = R.string.price_product_form_label),
             onValueChange = { newValue ->
                 addProductViewModel.updateProductData(newValue, FieldType.PRICE)
             },
@@ -127,17 +174,6 @@ fun FormProduct(
         val isWarningCategoriesShow by addProductViewModel.warningCategories.collectAsState()
         if (isWarningCategoriesShow) {
             AlertCategories()
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = addProductViewModel.buttonEnabled.collectAsState().value,
-            onClick = {
-                addProductViewModel.saveProduct {
-                    navController.popBackStack()
-                }
-            }) {
-            Text(text = "Guardar Producto")
         }
     }
 }
@@ -168,7 +204,7 @@ private fun AlertCategories() {
             Text(
                 modifier = Modifier
                     .padding(16.dp),
-                text = "No olvides agregar categorias antes de agregar un producto",
+                text = stringResource(id = R.string.warning_category_form_label),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = Color.White,
@@ -202,7 +238,7 @@ fun Spinner(addProductViewModel: AddProductViewModel) {
                 .onGloballyPositioned { coordinates ->
                     mTextFieldSize = coordinates.size.toSize()
                 },
-            label = { Text("Seleccionar Categoria") },
+            label = { Text(stringResource(id = R.string.category_product_form_label)) },
             trailingIcon = {
                 Icon(icon, "contentDescription",
                     Modifier.clickable { mExpanded = !mExpanded })

@@ -22,6 +22,7 @@ accompanist-permissions = "0.35.0-alpha"
 navigationCompose = "2.7.7"
 kotlin_version = "2.0.0"
 ksp_version = "2.0.0-1.0.22"
+playServicesCodeScanner = "16.1.0"
 retrofit = "2.11.0"
 okhttpVersion = "4.9.1"
 roomRuntime = "2.6.1"
@@ -58,6 +59,7 @@ lifecycle-viewmodel-compose-library = { group = "androidx.lifecycle", name = "li
 constraint-layout-compose-library = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintLayoutCompose" }
 accompanist-permissions-library = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist-permissions" }
 navigation-compose-library = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+play-services-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "playServicesCodeScanner" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 symbol-processing-api-v1100100 = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp_version" }
 loggingInterceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttpVersion" }

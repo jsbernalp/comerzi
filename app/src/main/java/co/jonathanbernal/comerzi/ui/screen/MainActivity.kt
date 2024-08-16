@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -92,8 +93,8 @@ fun NavController(
     navController: NavHostController,
     innerPadding: PaddingValues
 ) {
-    NavHost(navController = navController, startDestination = NavItem.Home.route) {
-        composable(NavItem.Home.route) {
+    NavHost(navController = navController, startDestination = NavItem.Product.route) {
+        composable(NavItem.Product.route) {
             ProductScreen(
                 productViewModel = productViewModel,
                 navController = navController,
@@ -111,7 +112,7 @@ fun NavController(
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
-    val items = listOf(NavItem.Home, NavItem.Category)
+    val items = listOf(NavItem.Product, NavItem.Category)
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     BottomAppBar {
@@ -130,9 +131,12 @@ fun BottomNavigationBar(navController: NavHostController) {
                             restoreState = true
                         }
                     },
-                    label = { Text(text = item.title) },
+                    label = { Text(text = stringResource(item.title)) },
                     icon = {
-                        Icon(painterResource(id = item.icon), contentDescription = item.title)
+                        Icon(
+                            painterResource(id = item.icon),
+                            contentDescription = stringResource(item.title)
+                        )
                     })
             }
         }
