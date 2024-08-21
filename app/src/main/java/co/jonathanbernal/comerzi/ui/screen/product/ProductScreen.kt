@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CardDefaults
@@ -29,6 +30,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +41,7 @@ import androidx.navigation.NavController
 import co.jonathanbernal.comerzi.R
 import co.jonathanbernal.comerzi.ui.models.Product
 import co.jonathanbernal.comerzi.viewModels.product.ProductViewModel
+import coil.compose.AsyncImage
 import java.math.BigDecimal
 
 
@@ -126,12 +130,15 @@ fun ItemProduct(item: Product, onDeleteClick: () -> Unit) {
             contentAlignment = Alignment.Center
         ) {
             Column {
-                Icon(
-                    painterResource(id = R.drawable.baseline_qr_code_scanner_24),
-                    contentDescription = "warning",
+                AsyncImage(
                     modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
                         .fillMaxWidth()
-                        .height(150.dp)
+                        .height(200.dp),
+                    model = item.photo,
+                    contentDescription = "Image",
+                    placeholder = painterResource(id = R.drawable.baseline_warning_24),
+                    contentScale = ContentScale.Crop,
                 )
                 Row(
                     modifier = Modifier

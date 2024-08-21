@@ -1,5 +1,6 @@
 package co.jonathanbernal.comerzi.ui.screen
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,6 +31,7 @@ import co.jonathanbernal.comerzi.ui.screen.category.CategoryScreen
 import co.jonathanbernal.comerzi.ui.screen.product.AddProductScreen
 import co.jonathanbernal.comerzi.ui.screen.product.ProductScreen
 import co.jonathanbernal.comerzi.ui.theme.Purple40
+import co.jonathanbernal.comerzi.viewModels.camera.CameraViewModel
 import co.jonathanbernal.comerzi.viewModels.category.CategoryViewModel
 import co.jonathanbernal.comerzi.viewModels.product.AddProductViewModel
 import co.jonathanbernal.comerzi.viewModels.product.ProductViewModel
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
     private val categoryViewModel: CategoryViewModel by viewModels()
     private val productViewModel: ProductViewModel by viewModels()
     private val addProductViewModel: AddProductViewModel by viewModels()
+    private val cameraViewModel: CameraViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,8 +62,10 @@ class MainActivity : ComponentActivity() {
                     addProductViewModel,
                     productViewModel,
                     categoryViewModel,
+                    cameraViewModel,
                     navController,
-                    innerPadding
+                    innerPadding,
+                    applicationContext
                 )
             },
             bottomBar = {
@@ -90,8 +95,10 @@ fun NavController(
     addProductViewModel: AddProductViewModel,
     productViewModel: ProductViewModel,
     categoryViewModel: CategoryViewModel,
+    cameraViewModel: CameraViewModel,
     navController: NavHostController,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    applicationContext: Context
 ) {
     NavHost(navController = navController, startDestination = NavItem.Product.route) {
         composable(NavItem.Product.route) {
@@ -106,6 +113,9 @@ fun NavController(
         }
         composable("addProduct") {
             AddProductScreen(addProductViewModel, navController, innerPadding)
+        }
+        composable("camera") {
+
         }
     }
 }

@@ -17,6 +17,7 @@ class ProductUseCase @Inject constructor(
         name: String,
         ean: String,
         price: Double,
+        photo: String,
         category: Category?
     ): Result<Unit> {
         category?.let { categoryValue ->
@@ -30,6 +31,7 @@ class ProductUseCase @Inject constructor(
                             name,
                             ean,
                             price,
+                            photo,
                             categoryValue
                         ).toProductTable()
                     )
@@ -49,12 +51,14 @@ class ProductUseCase @Inject constructor(
         name: String,
         ean: String,
         price: Double,
+        photo: String,
         categoryValue: Category
     ): Product {
         return Product(
             name = name,
             ean = ean,
             price = price,
+            photo = photo,
             category = categoryValue
         )
     }

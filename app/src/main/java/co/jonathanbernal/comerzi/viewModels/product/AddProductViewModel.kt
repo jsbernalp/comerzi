@@ -1,5 +1,6 @@
 package co.jonathanbernal.comerzi.viewModels.product
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class FieldType {
-    NAME, EAN, PRICE, CATEGORY
+    NAME, EAN, PRICE, CATEGORY, PHOTO
 }
 
 @HiltViewModel
@@ -48,13 +49,24 @@ class AddProductViewModel @Inject constructor(
     private val _warningCategories = MutableStateFlow(false)
     val warningCategories: StateFlow<Boolean> = _warningCategories.asStateFlow()
 
+    private val _photo = MutableStateFlow<Uri?>(null)
+    val photo: StateFlow<Uri?> = _photo.asStateFlow()
+
+    private val _openCamera = MutableStateFlow(false)
+    val openCamera: StateFlow<Boolean> = _openCamera.asStateFlow()
+
     fun updateProductData(value: Any?, fieldType: FieldType) {
         when (fieldType) {
             FieldType.NAME -> _productName.value = value as String
             FieldType.EAN -> _productEan.value = value as String
             FieldType.PRICE -> _productPrice.value = value as String
             FieldType.CATEGORY -> _categorySelected.value = value as Category?
+            FieldType.PHOTO -> _photo.value = value as Uri?
         }
+    }
+
+    fun openCamera(newValue: Boolean) {
+        _openCamera.value = newValue
     }
 
     fun getCategories() {
@@ -72,6 +84,7 @@ class AddProductViewModel @Inject constructor(
                 _productName.value,
                 _productEan.value,
                 _productPrice.value.toDouble(),
+                _photo.value.toString(),
                 _categorySelected.value
             ).fold(
                 onSuccess = {
@@ -101,9 +114,10 @@ class AddProductViewModel @Inject constructor(
             _productName,
             _productEan,
             _productPrice,
+            _photo,
             _categorySelected
-        ) { name, ean, price, category ->
-            name.isNotBlank() && ean.isNotBlank() && price.isNotBlank() && category != null
+        ) { name, ean, price, photo, category ->
+            name.isNotBlank() && ean.isNotBlank() && price.isNotBlank() && photo != null && category != null
         }.toStateFlow(CoroutineScope(coroutineContext), false)
 
 }

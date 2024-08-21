@@ -1,21 +1,29 @@
 package co.jonathanbernal.comerzi.ui.screen.product
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -36,10 +44,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -52,11 +63,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
 import co.jonathanbernal.comerzi.R
+import co.jonathanbernal.comerzi.ui.screen.camera.CameraPreview
 import co.jonathanbernal.comerzi.ui.screen.category.CustomTextField
 import co.jonathanbernal.comerzi.ui.screen.common.TopBarText
 import co.jonathanbernal.comerzi.utils.orEmpty
 import co.jonathanbernal.comerzi.viewModels.product.AddProductViewModel
 import co.jonathanbernal.comerzi.viewModels.product.FieldType
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +82,7 @@ fun AddProductScreen(
     addProductViewModel.getCategories()
     Scaffold(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(innerPadding),
         topBar = {
             TopAppBar(
@@ -87,7 +100,21 @@ fun AddProductScreen(
             )
         },
         content = { contentInnerPadding ->
-            FormProduct(addProductViewModel, contentInnerPadding, keyboardController)
+            val openCamera by addProductViewModel.openCamera.collectAsState()
+            if (openCamera) {
+                CameraPreview(innerPadding = innerPadding) {
+                    Log.e("AddProductScreen", "uri de la imagen: $it")
+                    addProductViewModel.updateProductData(it, FieldType.PHOTO)
+                    addProductViewModel.openCamera(false)
+                }
+            } else {
+                FormProduct(
+                    addProductViewModel,
+                    contentInnerPadding,
+                    keyboardController,
+                    navController
+                )
+            }
         },
         bottomBar = {
             Button(
@@ -114,14 +141,18 @@ fun AddProductScreen(
 fun FormProduct(
     addProductViewModel: AddProductViewModel,
     innerPadding: PaddingValues,
-    keyboardController: SoftwareKeyboardController?
+    keyboardController: SoftwareKeyboardController?,
+    navController: NavController
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
             .padding(innerPadding)
-            .padding(horizontal = 16.dp)
+            .padding(16.dp)
     ) {
+        val photo by addProductViewModel.photo.collectAsState()
+        CustomPhotoProduct(photo, addProductViewModel)
         val productNameValue by addProductViewModel.productName.collectAsState()
         Spacer(modifier = Modifier.height(16.dp))
         CustomTextField(
@@ -177,6 +208,50 @@ fun FormProduct(
         }
     }
 }
+
+@Composable
+fun CustomPhotoProduct(photo: Uri?, addProductViewModel: AddProductViewModel) {
+    photo?.let {
+        AsyncImage(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .fillMaxWidth()
+                .height(200.dp),
+            model = photo,
+            contentDescription = "Image",
+            placeholder = painterResource(id = R.drawable.baseline_warning_24),
+            contentScale = ContentScale.Crop,
+        )
+    } ?: run {
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            colors = CardDefaults.cardColors(Color.Gray),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 3.dp
+            ),
+            onClick = {
+                addProductViewModel.openCamera(true)
+            }
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp),
+                    imageVector = Icons.Default.PhotoCamera, contentDescription = null
+                )
+                Text(text = "Agregar foto")
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun AlertCategories() {

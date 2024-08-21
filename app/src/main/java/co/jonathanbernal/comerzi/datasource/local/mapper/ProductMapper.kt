@@ -10,6 +10,7 @@ fun ProductTable.toProduct() = Product(
     name = name,
     ean = ean,
     price = price,
+    photo = photo,
     category = category.toCategory()
 )
 
@@ -17,5 +18,6 @@ fun Product.toProductTable() = ProductTable(
     name = name,
     ean = ean,
     price = price,
+    photo = photo,
     category = category.toCategoryTable()
 )

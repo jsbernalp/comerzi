@@ -12,5 +12,6 @@ data class ProductTable(
     val name: String,
     val ean: String,
     val price: Double,
+    val photo: String,
     @Embedded val category: CategoryTable
 )
