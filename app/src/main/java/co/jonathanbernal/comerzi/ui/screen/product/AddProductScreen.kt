@@ -61,6 +61,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import co.jonathanbernal.comerzi.R
 import co.jonathanbernal.comerzi.ui.screen.camera.CameraPreview
@@ -74,10 +75,10 @@ import coil.compose.AsyncImage
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddProductScreen(
-    addProductViewModel: AddProductViewModel,
     navController: NavController,
     innerPadding: PaddingValues
 ) {
+    val addProductViewModel = hiltViewModel<AddProductViewModel>()
     val keyboardController = LocalSoftwareKeyboardController.current
     addProductViewModel.getCategories()
     Scaffold(

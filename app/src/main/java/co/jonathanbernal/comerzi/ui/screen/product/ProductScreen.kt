@@ -37,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import co.jonathanbernal.comerzi.R
 import co.jonathanbernal.comerzi.ui.models.Product
@@ -47,15 +48,15 @@ import java.math.BigDecimal
 
 @Composable
 fun ProductScreen(
-    productViewModel: ProductViewModel,
     navController: NavController,
     innerPadding: PaddingValues
 ) {
+    val productViewModel = hiltViewModel<ProductViewModel>()
     productViewModel.getAllProducts()
     Scaffold(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(innerPadding),
+            .padding(innerPadding)
+            .fillMaxSize(),
         content = { currentInnerPadding ->
             ContentProductList(productViewModel, currentInnerPadding)
         },
@@ -88,7 +89,7 @@ private fun ContentProductList(productViewModel: ProductViewModel, innerPadding:
         val products by productViewModel.products.collectAsState()
         ListProduct(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(horizontal = 8.dp)
                 .align(Alignment.TopStart),
             itemsCategory = products,

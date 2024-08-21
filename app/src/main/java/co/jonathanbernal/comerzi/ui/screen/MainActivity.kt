@@ -1,12 +1,11 @@
 package co.jonathanbernal.comerzi.ui.screen
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -18,6 +17,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,19 +31,10 @@ import co.jonathanbernal.comerzi.ui.screen.category.CategoryScreen
 import co.jonathanbernal.comerzi.ui.screen.product.AddProductScreen
 import co.jonathanbernal.comerzi.ui.screen.product.ProductScreen
 import co.jonathanbernal.comerzi.ui.theme.Purple40
-import co.jonathanbernal.comerzi.viewModels.camera.CameraViewModel
-import co.jonathanbernal.comerzi.viewModels.category.CategoryViewModel
-import co.jonathanbernal.comerzi.viewModels.product.AddProductViewModel
-import co.jonathanbernal.comerzi.viewModels.product.ProductViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    private val categoryViewModel: CategoryViewModel by viewModels()
-    private val productViewModel: ProductViewModel by viewModels()
-    private val addProductViewModel: AddProductViewModel by viewModels()
-    private val cameraViewModel: CameraViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,16 +48,9 @@ class MainActivity : ComponentActivity() {
     private fun ViewContainer() {
         val navController = rememberNavController()
         Scaffold(
+            modifier = Modifier.fillMaxSize(),
             content = { innerPadding ->
-                NavController(
-                    addProductViewModel,
-                    productViewModel,
-                    categoryViewModel,
-                    cameraViewModel,
-                    navController,
-                    innerPadding,
-                    applicationContext
-                )
+                NavController(navController, innerPadding)
             },
             bottomBar = {
                 BottomNavigationBar(navController)
@@ -92,30 +76,21 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun NavController(
-    addProductViewModel: AddProductViewModel,
-    productViewModel: ProductViewModel,
-    categoryViewModel: CategoryViewModel,
-    cameraViewModel: CameraViewModel,
     navController: NavHostController,
     innerPadding: PaddingValues,
-    applicationContext: Context
 ) {
     NavHost(navController = navController, startDestination = NavItem.Product.route) {
         composable(NavItem.Product.route) {
             ProductScreen(
-                productViewModel = productViewModel,
                 navController = navController,
                 innerPadding
             )
         }
         composable(NavItem.Category.route) {
-            CategoryScreen(categoryViewModel, innerPadding)
+            CategoryScreen(innerPadding)
         }
         composable("addProduct") {
-            AddProductScreen(addProductViewModel, navController, innerPadding)
-        }
-        composable("camera") {
-
+            AddProductScreen(navController, innerPadding)
         }
     }
 }

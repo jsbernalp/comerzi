@@ -40,13 +40,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.ui.screen.common.TopBarText
 import co.jonathanbernal.comerzi.ui.theme.ComerziTheme
 import co.jonathanbernal.comerzi.viewModels.category.CategoryViewModel
 
 @Composable
-fun CategoryScreen(categoryViewModel: CategoryViewModel, innerPadding: PaddingValues) {
+fun CategoryScreen(innerPadding: PaddingValues) {
+    val categoryViewModel = hiltViewModel<CategoryViewModel>()
     categoryViewModel.newCategoryName("")
     categoryViewModel.getAllCategories()
     val keyboardController = LocalSoftwareKeyboardController.current
