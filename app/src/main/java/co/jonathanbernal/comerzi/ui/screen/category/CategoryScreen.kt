@@ -21,14 +21,12 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.jonathanbernal.comerzi.ui.models.Category
-import co.jonathanbernal.comerzi.ui.screen.common.TopBarText
 import co.jonathanbernal.comerzi.ui.theme.ComerziTheme
 import co.jonathanbernal.comerzi.viewModels.category.CategoryViewModel
 
@@ -54,11 +51,8 @@ fun CategoryScreen(innerPadding: PaddingValues) {
     val keyboardController = LocalSoftwareKeyboardController.current
     Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding),
-        topBar = {
-            TopBarCategoryScreen()
-        },
+            .padding(innerPadding)
+            .fillMaxSize(),
         content = { innerPadding ->
             ContentCategoryScreen(categoryViewModel, innerPadding, keyboardController)
         }
@@ -97,19 +91,6 @@ private fun ContentCategoryScreen(
             categoryViewModel.deleteCategory(deleteCategory.id)
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBarCategoryScreen() {
-    TopAppBar(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
-        title = {
-            TopBarText("Categorias")
-        }
-    )
 }
 
 @Composable

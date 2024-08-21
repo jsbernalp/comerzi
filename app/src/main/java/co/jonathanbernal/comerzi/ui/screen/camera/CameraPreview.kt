@@ -32,7 +32,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -62,30 +61,23 @@ fun CameraPreview(
             setEnabledUseCases(CameraController.IMAGE_CAPTURE)
         }
     }
-    Scaffold(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(innerPadding),
-        content = { scaffoldPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(scaffoldPadding)
-            ) {
-                val currentPhoto by cameraViewModel.photo.collectAsState()
-                currentPhoto?.let { photo ->
-                    ImageCaptured(
-                        onUriChange = onUriChange,
-                        modifier = Modifier.fillMaxSize(),
-                        bitmap = photo,
-                        cameraViewModel = cameraViewModel
-                    )
-                } ?: run {
-                    Camera(cameraViewModel, controller, applicationContext)
-                }
-            }
+            .padding(innerPadding)
+    ) {
+        val currentPhoto by cameraViewModel.photo.collectAsState()
+        currentPhoto?.let { photo ->
+            ImageCaptured(
+                onUriChange = onUriChange,
+                modifier = Modifier.fillMaxSize(),
+                bitmap = photo,
+                cameraViewModel = cameraViewModel
+            )
+        } ?: run {
+            Camera(cameraViewModel, controller, applicationContext)
         }
-    )
+    }
 }
 
 @Composable
@@ -173,6 +165,7 @@ fun ImageCaptured(
             Button(onClick = {
                 cameraViewModel.storePhotoInGallery() { uri ->
                     onUriChange.invoke(uri)
+
                 }
             }) {
                 Icon(

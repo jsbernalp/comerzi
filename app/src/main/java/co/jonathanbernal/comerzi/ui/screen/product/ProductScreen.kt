@@ -49,7 +49,8 @@ import java.math.BigDecimal
 @Composable
 fun ProductScreen(
     navController: NavController,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    navigateTo: (Unit) -> Unit
 ) {
     val productViewModel = hiltViewModel<ProductViewModel>()
     productViewModel.getAllProducts()
@@ -60,15 +61,15 @@ fun ProductScreen(
         content = { currentInnerPadding ->
             ContentProductList(productViewModel, currentInnerPadding)
         },
-        floatingActionButton = { AddProduct(navController) },
+        floatingActionButton = { AddProduct(navController,navigateTo) },
         floatingActionButtonPosition = FabPosition.End
     )
 }
 
 @Composable
-fun AddProduct(navController: NavController) {
+fun AddProduct(navController: NavController, navigateTo: (Unit) -> Unit) {
     ExtendedFloatingActionButton(
-        onClick = { navController.navigate("addProduct") },
+        onClick = { navigateTo.invoke(Unit) },
         icon = {
             Icon(
                 Icons.Default.Add,

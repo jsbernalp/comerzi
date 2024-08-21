@@ -1,7 +1,5 @@
 package co.jonathanbernal.comerzi.ui.screen.product
 
-import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -64,7 +62,6 @@ import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import co.jonathanbernal.comerzi.R
-import co.jonathanbernal.comerzi.ui.screen.camera.CameraPreview
 import co.jonathanbernal.comerzi.ui.screen.category.CustomTextField
 import co.jonathanbernal.comerzi.ui.screen.common.TopBarText
 import co.jonathanbernal.comerzi.utils.orEmpty
@@ -76,9 +73,13 @@ import coil.compose.AsyncImage
 @Composable
 fun AddProductScreen(
     navController: NavController,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    uri: String,
+    onNavigateTo: () -> Unit
 ) {
     val addProductViewModel = hiltViewModel<AddProductViewModel>()
+    addProductViewModel.updateProductData(uri, FieldType.PHOTO)
+
     val keyboardController = LocalSoftwareKeyboardController.current
     addProductViewModel.getCategories()
     Scaffold(
@@ -101,21 +102,13 @@ fun AddProductScreen(
             )
         },
         content = { contentInnerPadding ->
-            val openCamera by addProductViewModel.openCamera.collectAsState()
-            if (openCamera) {
-                CameraPreview(innerPadding = innerPadding) {
-                    Log.e("AddProductScreen", "uri de la imagen: $it")
-                    addProductViewModel.updateProductData(it, FieldType.PHOTO)
-                    addProductViewModel.openCamera(false)
-                }
-            } else {
-                FormProduct(
-                    addProductViewModel,
-                    contentInnerPadding,
-                    keyboardController,
-                    navController
-                )
-            }
+            FormProduct(
+                addProductViewModel,
+                contentInnerPadding,
+                keyboardController,
+                navController,
+                onNavigateTo
+            )
         },
         bottomBar = {
             Button(
@@ -143,7 +136,8 @@ fun FormProduct(
     addProductViewModel: AddProductViewModel,
     innerPadding: PaddingValues,
     keyboardController: SoftwareKeyboardController?,
-    navController: NavController
+    navController: NavController,
+    onNavigateTo: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -153,7 +147,7 @@ fun FormProduct(
             .padding(16.dp)
     ) {
         val photo by addProductViewModel.photo.collectAsState()
-        CustomPhotoProduct(photo, addProductViewModel)
+        CustomPhotoProduct(navController, photo, onNavigateTo)
         val productNameValue by addProductViewModel.productName.collectAsState()
         Spacer(modifier = Modifier.height(16.dp))
         CustomTextField(
@@ -211,8 +205,12 @@ fun FormProduct(
 }
 
 @Composable
-fun CustomPhotoProduct(photo: Uri?, addProductViewModel: AddProductViewModel) {
-    photo?.let {
+fun CustomPhotoProduct(
+    navController: NavController,
+    photo: String,
+    onNavigateTo: () -> Unit
+) {
+    if (photo.isNotBlank()) {
         AsyncImage(
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
@@ -223,7 +221,7 @@ fun CustomPhotoProduct(photo: Uri?, addProductViewModel: AddProductViewModel) {
             placeholder = painterResource(id = R.drawable.baseline_warning_24),
             contentScale = ContentScale.Crop,
         )
-    } ?: run {
+    } else {
         ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
@@ -233,7 +231,7 @@ fun CustomPhotoProduct(photo: Uri?, addProductViewModel: AddProductViewModel) {
                 defaultElevation = 3.dp
             ),
             onClick = {
-                addProductViewModel.openCamera(true)
+                onNavigateTo()
             }
         ) {
             Column(

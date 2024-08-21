@@ -1,6 +1,5 @@
 package co.jonathanbernal.comerzi.viewModels.product
 
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -49,8 +48,8 @@ class AddProductViewModel @Inject constructor(
     private val _warningCategories = MutableStateFlow(false)
     val warningCategories: StateFlow<Boolean> = _warningCategories.asStateFlow()
 
-    private val _photo = MutableStateFlow<Uri?>(null)
-    val photo: StateFlow<Uri?> = _photo.asStateFlow()
+    private val _photo = MutableStateFlow<String>("")
+    val photo: StateFlow<String> = _photo.asStateFlow()
 
     private val _openCamera = MutableStateFlow(false)
     val openCamera: StateFlow<Boolean> = _openCamera.asStateFlow()
@@ -61,7 +60,7 @@ class AddProductViewModel @Inject constructor(
             FieldType.EAN -> _productEan.value = value as String
             FieldType.PRICE -> _productPrice.value = value as String
             FieldType.CATEGORY -> _categorySelected.value = value as Category?
-            FieldType.PHOTO -> _photo.value = value as Uri?
+            FieldType.PHOTO -> _photo.value = value as String
         }
     }
 
@@ -117,7 +116,7 @@ class AddProductViewModel @Inject constructor(
             _photo,
             _categorySelected
         ) { name, ean, price, photo, category ->
-            name.isNotBlank() && ean.isNotBlank() && price.isNotBlank() && photo != null && category != null
+            name.isNotBlank() && ean.isNotBlank() && price.isNotBlank() && photo.isNotBlank() && category != null
         }.toStateFlow(CoroutineScope(coroutineContext), false)
 
 }
