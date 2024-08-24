@@ -14,11 +14,14 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -27,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,10 +40,11 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.jonathanbernal.comerzi.ui.models.Category
+import co.jonathanbernal.comerzi.ui.screen.product.TextWithLabel
 import co.jonathanbernal.comerzi.ui.theme.ComerziTheme
 import co.jonathanbernal.comerzi.viewModels.category.CategoryViewModel
 
@@ -54,6 +59,22 @@ fun CategoryScreen(innerPadding: PaddingValues) {
             .padding(innerPadding)
             .fillMaxSize(),
         content = { innerPadding ->
+            val editCategory by categoryViewModel.editCategory.collectAsState()
+            editCategory?.let { categoryEdit ->
+                EditCategoryDialog(innerPadding, categoryEdit, keyboardController, {
+                    categoryViewModel.editCategory(null)
+                }, { newValue ->
+                    categoryViewModel.editCategory(
+                        Category(
+                            name = newValue,
+                            id = categoryEdit.id,
+                            date = categoryEdit.date
+                        )
+                    )
+                }, {
+                    categoryViewModel.saveEditCategory()
+                })
+            }
             ContentCategoryScreen(categoryViewModel, innerPadding, keyboardController)
         }
     )
@@ -83,13 +104,13 @@ private fun ContentCategoryScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
         ListCategory(
-            modifier = Modifier
-                .wrapContentSize()
-                .padding(horizontal = 10.dp),
-            sampleItems
-        ) { deleteCategory ->
-            categoryViewModel.deleteCategory(deleteCategory.id)
-        }
+            sampleItems,
+            { deleteCategory ->
+                categoryViewModel.deleteCategory(deleteCategory.id)
+            },
+            { editCategory ->
+                categoryViewModel.editCategory(editCategory)
+            })
     }
 }
 
@@ -191,44 +212,131 @@ fun CustomTextField(
 
 @Composable
 fun ListCategory(
-    modifier: Modifier,
     itemsCategory: List<Category>,
-    onDeleteClick: (Category) -> Unit
+    onDeleteClick: (Category) -> Unit,
+    onEditClick: (Category) -> Unit
 ) {
     LazyColumn(
-        modifier = modifier,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 5.dp, horizontal = 10.dp),
         verticalArrangement = Arrangement.Top
     ) {
         items(itemsCategory) { item ->
-            ItemRow(item, onDeleteClick = { onDeleteClick(item) })
+            ItemRow(item,
+                onDeleteClick = { onDeleteClick(item) },
+                onEditClick = { onEditClick(item) })
         }
     }
 }
 
 @Composable
-fun ItemRow(item: Category, onDeleteClick: () -> Unit) {
+fun ItemRow(
+    item: Category,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .wrapContentHeight()
+            .padding(vertical = 5.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = item.name,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Justify,
-        )
-        IconButton(onClick = onDeleteClick) {
-            Icon(Icons.Default.Delete, contentDescription = "Delete Item")
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 3.dp
+            )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                IconButton(onClick = { onEditClick() }) {
+                    Icon(Icons.Default.Edit, contentDescription = "Delete Item")
+                }
+                TextWithLabel(
+                    horizontalAlignment = Alignment.Start,
+                    labelValue = "Nombre",
+                    textValue = item.name
+                )
+                IconButton(onClick = onDeleteClick) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete Item")
+                }
+            }
         }
     }
 }
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     ComerziTheme {
         // CategoryScreen(categoryViewModel)
+    }
+}
+
+@Composable
+fun EditCategoryDialog(
+    innerPadding: PaddingValues,
+    editCategory: Category,
+    keyboardController: SoftwareKeyboardController?,
+    onDismissRequest: () -> Unit,
+    onChangeCategoryName: (String) -> Unit,
+    onSaveCategory: () -> Unit
+) {
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(innerPadding),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(top = 16.dp)
+                    .padding(horizontal = 8.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CustomTextField(
+                    modifier = Modifier
+                        .padding(PaddingValues(horizontal = 16.dp))
+                        .wrapContentHeight(),
+                    textFieldValue = editCategory.name,
+                    label = "Nombre de la categoria",
+                    onValueChange = { newValue ->
+                        onChangeCategoryName(newValue)
+                    },
+                    keyboardController
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    TextButton(
+                        onClick = { onDismissRequest() },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Cancelar")
+                    }
+                    TextButton(
+                        onClick = { onSaveCategory() },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Guardar")
+                    }
+                }
+            }
+        }
     }
 }

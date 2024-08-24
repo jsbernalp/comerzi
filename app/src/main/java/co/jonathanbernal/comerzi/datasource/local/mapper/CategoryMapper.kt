@@ -20,6 +20,6 @@ fun CategoryTable.toCategory(): Category {
 fun Category.toCategoryTable(): CategoryTable {
     return CategoryTable(
         idCategory = this.id,
-        categoryName = this.name,
+        categoryName = this.name.uppercase(),
     )
 }

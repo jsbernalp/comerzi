@@ -28,8 +28,15 @@ class CategoryViewModel @Inject constructor(
     private val _categories = MutableStateFlow(listOf<Category>())
     val categories: StateFlow<List<Category>> = _categories.asStateFlow()
 
+    private val _editCategory = MutableStateFlow<Category?>(null)
+    val editCategory: StateFlow<Category?> = _editCategory.asStateFlow()
+
     fun newCategoryName(value: String) {
         _category.value = value
+    }
+
+    fun editCategory(value: Category?) {
+        _editCategory.value = value
     }
 
     fun getAllCategories() {
@@ -58,6 +65,15 @@ class CategoryViewModel @Inject constructor(
     fun deleteCategory(id: Int) {
         viewModelScope.launch {
             categoryUseCase.deleteCategoryFromDb(id)
+        }
+    }
+
+    fun saveEditCategory() {
+        viewModelScope.launch {
+            _editCategory.value?.let { category ->
+                categoryUseCase.updateCategory(category)
+                editCategory(null)
+            }
         }
     }
 

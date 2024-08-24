@@ -2,6 +2,7 @@ package co.jonathanbernal.comerzi.useCases
 
 import co.jonathanbernal.comerzi.datasource.CategoryRepository
 import co.jonathanbernal.comerzi.datasource.local.mapper.toCategories
+import co.jonathanbernal.comerzi.datasource.local.mapper.toCategoryTable
 import co.jonathanbernal.comerzi.datasource.local.models.CategoryTable
 import co.jonathanbernal.comerzi.ui.models.Category
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +21,10 @@ class CategoryUseCase @Inject constructor(
 
     suspend fun addCategory(categoryName: String): Result<Unit> {
         return categoryRepository.addCategory(CategoryTable(categoryName = categoryName.uppercase()))
+    }
+
+    suspend fun updateCategory(category: Category) {
+        categoryRepository.updateCategory(category.toCategoryTable())
     }
 
     suspend fun deleteCategoryFromDb(id: Int) {

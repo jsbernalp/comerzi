@@ -106,7 +106,6 @@ fun AddProductScreen(
                 addProductViewModel,
                 contentInnerPadding,
                 keyboardController,
-                navController,
                 onNavigateTo
             )
         },
@@ -136,7 +135,6 @@ fun FormProduct(
     addProductViewModel: AddProductViewModel,
     innerPadding: PaddingValues,
     keyboardController: SoftwareKeyboardController?,
-    navController: NavController,
     onNavigateTo: () -> Unit
 ) {
     Column(
@@ -147,7 +145,7 @@ fun FormProduct(
             .padding(16.dp)
     ) {
         val photo by addProductViewModel.photo.collectAsState()
-        CustomPhotoProduct(navController, photo, onNavigateTo)
+        CustomPhotoProduct(photo, onNavigateTo)
         val productNameValue by addProductViewModel.productName.collectAsState()
         Spacer(modifier = Modifier.height(16.dp))
         CustomTextField(
@@ -206,7 +204,6 @@ fun FormProduct(
 
 @Composable
 fun CustomPhotoProduct(
-    navController: NavController,
     photo: String,
     onNavigateTo: () -> Unit
 ) {
