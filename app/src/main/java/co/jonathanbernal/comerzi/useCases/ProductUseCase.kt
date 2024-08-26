@@ -1,16 +1,19 @@
 package co.jonathanbernal.comerzi.useCases
 
+import co.jonathanbernal.comerzi.datasource.CategoryRepository
 import co.jonathanbernal.comerzi.datasource.ProductRepository
+import co.jonathanbernal.comerzi.datasource.local.mapper.toProduct
 import co.jonathanbernal.comerzi.datasource.local.mapper.toProductTable
-import co.jonathanbernal.comerzi.datasource.local.mapper.toProducts
 import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.ui.models.Product
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ProductUseCase @Inject constructor(
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val categoryRepository: CategoryRepository
 ) {
 
     suspend fun addProduct(
@@ -42,10 +45,20 @@ class ProductUseCase @Inject constructor(
         }
     }
 
-    fun getAllProducts(): Flow<List<Product>> =
+/*    fun getAllProducts(): Flow<List<Product>> =
         productRepository.getAllProducts().map { list ->
             list.toProducts()
-        }
+        }*/
+
+    fun getAllCategoriesWithProducts(): Flow<List<Product>> {
+        return categoryRepository.getAllCategoriesWithProducts().map {
+            it.flatMap { categoryWithProducts ->
+                categoryWithProducts.products.map { productTable ->
+                    productTable.toProduct(categoryWithProducts.category)
+                }
+            }
+        }.distinctUntilChanged()
+    }
 
     private fun getProduct(
         name: String,

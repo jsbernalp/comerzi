@@ -2,6 +2,7 @@ package co.jonathanbernal.comerzi.datasource
 
 import co.jonathanbernal.comerzi.datasource.local.dao.CategoryDao
 import co.jonathanbernal.comerzi.datasource.local.models.CategoryTable
+import co.jonathanbernal.comerzi.datasource.local.models.CategoryWIthProducts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
@@ -32,4 +33,6 @@ class CategoryRepository @Inject constructor(
     fun getAllCategories(): Flow<List<CategoryTable>> =
         categoryDao.getAllCategories().flowOn(Dispatchers.IO).conflate()
 
+    fun getAllCategoriesWithProducts(): Flow<List<CategoryWIthProducts>> =
+        categoryDao.getAllCategoriesWithProducts().flowOn(Dispatchers.IO).conflate()
 }

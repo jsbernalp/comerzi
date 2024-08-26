@@ -4,8 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import co.jonathanbernal.comerzi.datasource.local.models.CategoryTable
+import co.jonathanbernal.comerzi.datasource.local.models.CategoryWIthProducts
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -31,4 +33,8 @@ interface CategoryDao {
 
     @Query("DELETE from categoryTable")
     suspend fun deleteAllCategories()
+
+    @Transaction
+    @Query("SELECT * from categoryTable")
+    fun getAllCategoriesWithProducts(): Flow<List<CategoryWIthProducts>>
 }

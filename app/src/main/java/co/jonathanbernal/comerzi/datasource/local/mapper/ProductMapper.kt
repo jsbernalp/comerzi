@@ -1,12 +1,13 @@
 package co.jonathanbernal.comerzi.datasource.local.mapper
 
+import co.jonathanbernal.comerzi.datasource.local.models.CategoryTable
 import co.jonathanbernal.comerzi.datasource.local.models.ProductTable
 import co.jonathanbernal.comerzi.ui.models.Product
 
-fun List<ProductTable>.toProducts(): List<Product> =
-    map { it.toProduct() }
+/*fun List<ProductTable>.toProducts(): List<Product> =
+    map { it.toProduct() }*/
 
-fun ProductTable.toProduct() = Product(
+fun ProductTable.toProduct(category: CategoryTable) = Product(
     name = name,
     ean = ean,
     price = price,
@@ -19,5 +20,5 @@ fun Product.toProductTable() = ProductTable(
     ean = ean,
     price = price,
     photo = photo,
-    category = category.toCategoryTable()
+    categoryId = category.id
 )
