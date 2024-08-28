@@ -104,4 +104,34 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.loggingInterceptor)
 
+    //Room
+
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+
+    //Scanner
+    implementation (libs.play.services.code.scanner)
+
+    //cameraX
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    // If you want to additionally use the CameraX Lifecycle library
+    implementation (libs.androidx.camera.lifecycle)
+    // If you want to additionally use the CameraX VideoCapture library
+    implementation (libs.androidx.camera.video)
+    // If you want to additionally use the CameraX View class
+    implementation (libs.androidx.camera.view)
+    // If you want to additionally add CameraX ML Kit Vision Integration
+    implementation(libs.androidx.camera.mlkit.vision)
+    // If you want to additionally use the CameraX Extensions library
+    implementation(libs.androidx.camera.extensions)
+
+    //Icons
+    implementation(libs.androidx.material.icons.extended)
+
+    //Glide
+    implementation(libs.coil.compose)
+
 }

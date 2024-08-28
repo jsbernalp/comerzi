@@ -1,5 +1,7 @@
 [versions]
 agp = "8.5.1"
+cameraX = "1.4.0-rc01"
+coilCompose = "2.7.0"
 converterGson = "2.9.0"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
@@ -11,6 +13,7 @@ kotlinxCoroutinesAndroid = "1.7.3"
 lifecycleRuntimeKtx = "2.8.4"
 activityCompose = "1.9.1"
 composeBom = "2024.06.00"
+materialIconsExtended = "1.6.8"
 multidex = "2.0.1"
 dagger-hilt = "2.52"
 daggerHiltAndroid = "2.52"
@@ -22,13 +25,27 @@ accompanist-permissions = "0.35.0-alpha"
 navigationCompose = "2.7.7"
 kotlin_version = "2.0.0"
 ksp_version = "2.0.0-1.0.22"
+playServicesCodeScanner = "16.1.0"
 retrofit = "2.11.0"
 okhttpVersion = "4.9.1"
+roomRuntime = "2.6.1"
 
 
 
 [libraries]
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraX" }
+androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraX" }
+androidx-camera-extensions = { module = "androidx.camera:camera-extensions", version.ref = "cameraX" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraX" }
+androidx-camera-mlkit-vision = { module = "androidx.camera:camera-mlkit-vision", version.ref = "cameraX" }
+androidx-camera-video = { module = "androidx.camera:camera-video", version.ref = "cameraX" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraX" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -54,6 +71,7 @@ lifecycle-viewmodel-compose-library = { group = "androidx.lifecycle", name = "li
 constraint-layout-compose-library = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintLayoutCompose" }
 accompanist-permissions-library = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist-permissions" }
 navigation-compose-library = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+play-services-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "playServicesCodeScanner" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 symbol-processing-api-v1100100 = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp_version" }
 loggingInterceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttpVersion" }
