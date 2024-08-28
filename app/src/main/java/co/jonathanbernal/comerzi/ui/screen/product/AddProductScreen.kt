@@ -242,7 +242,7 @@ fun CustomPhotoProduct(
                         .height(100.dp),
                     imageVector = Icons.Default.PhotoCamera, contentDescription = null
                 )
-                Text(text = "Agregar foto")
+                Text(text = stringResource(id = R.string.add_photo_button_label))
             }
         }
     }
@@ -372,7 +372,7 @@ fun AddProductScreenPreview() {
             Text(
                 modifier = Modifier
                     .padding(16.dp),
-                text = "No olvides agregar categorias antes de agregar un producto",
+                text = stringResource(id = R.string.warning_category_form_label),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = Color.White,

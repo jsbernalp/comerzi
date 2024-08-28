@@ -38,7 +38,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import co.jonathanbernal.comerzi.R
 import co.jonathanbernal.comerzi.ui.models.Product
 import co.jonathanbernal.comerzi.viewModels.product.ProductViewModel
@@ -48,7 +47,6 @@ import java.math.BigDecimal
 
 @Composable
 fun ProductScreen(
-    navController: NavController,
     innerPadding: PaddingValues,
     navigateTo: (Unit) -> Unit
 ) {
@@ -61,13 +59,13 @@ fun ProductScreen(
         content = { currentInnerPadding ->
             ContentProductList(productViewModel, currentInnerPadding)
         },
-        floatingActionButton = { AddProduct(navController,navigateTo) },
+        floatingActionButton = { AddProduct(navigateTo) },
         floatingActionButtonPosition = FabPosition.End
     )
 }
 
 @Composable
-fun AddProduct(navController: NavController, navigateTo: (Unit) -> Unit) {
+fun AddProduct(navigateTo: (Unit) -> Unit) {
     ExtendedFloatingActionButton(
         onClick = { navigateTo.invoke(Unit) },
         icon = {

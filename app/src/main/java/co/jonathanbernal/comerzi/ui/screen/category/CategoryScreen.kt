@@ -38,11 +38,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import co.jonathanbernal.comerzi.R
 import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.ui.screen.product.TextWithLabel
 import co.jonathanbernal.comerzi.ui.theme.ComerziTheme
@@ -98,7 +100,7 @@ private fun ContentCategoryScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
-            text = "Listado de Categorias".uppercase(),
+            text = stringResource(id = R.string.category_list_title).uppercase(),
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )
@@ -138,7 +140,7 @@ fun AddCategoryCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight(),
-                text = "Deseas agregar una nueva categoria?",
+                text = stringResource(id = R.string.add_category_question),
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
             )
@@ -172,7 +174,7 @@ fun AddCategoryBox(
                 .wrapContentHeight()
                 .weight(3f),
             textFieldValue = categoryValue,
-            label = "Nombre de la categoria",
+            label = stringResource(id = R.string.add_category_name_label),
             onValueChange = { newValue ->
                 categoryViewModel.newCategoryName(newValue)
             },
@@ -260,7 +262,7 @@ fun ItemRow(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 IconButton(onClick = { onEditClick() }) {
-                    Icon(Icons.Default.Edit, contentDescription = "Delete Item")
+                    Icon(Icons.Default.Edit, contentDescription = "Edit Item")
                 }
                 TextWithLabel(
                     horizontalAlignment = Alignment.Start,
@@ -312,7 +314,7 @@ fun EditCategoryDialog(
                         .padding(PaddingValues(horizontal = 16.dp))
                         .wrapContentHeight(),
                     textFieldValue = editCategory.name,
-                    label = "Nombre de la categoria",
+                    label = stringResource(id = R.string.add_category_name_label),
                     onValueChange = { newValue ->
                         onChangeCategoryName(newValue)
                     },
@@ -327,13 +329,13 @@ fun EditCategoryDialog(
                         onClick = { onDismissRequest() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Cancelar")
+                        Text(stringResource(id = R.string.cancel_edit_category_button_label))
                     }
                     TextButton(
                         onClick = { onSaveCategory() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Guardar")
+                        Text(stringResource(id = R.string.save_category_button_label))
                     }
                 }
             }

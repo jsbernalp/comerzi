@@ -10,24 +10,19 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -38,7 +33,6 @@ import co.jonathanbernal.comerzi.ui.screen.camera.CameraPreview
 import co.jonathanbernal.comerzi.ui.screen.category.CategoryScreen
 import co.jonathanbernal.comerzi.ui.screen.product.AddProductScreen
 import co.jonathanbernal.comerzi.ui.screen.product.ProductScreen
-import co.jonathanbernal.comerzi.ui.theme.Purple40
 import co.jonathanbernal.comerzi.utils.orEmpty
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -80,21 +74,6 @@ class MainActivity : ComponentActivity() {
             }
         )
     }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Preview
-    @Composable
-    fun Toolbar() {
-        TopAppBar(
-            title = {
-                Text(text = "Comerzi")
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Purple40,
-                titleContentColor = Color.White
-            )
-        )
-    }
 }
 
 @Composable
@@ -107,10 +86,7 @@ fun NavController(
     NavHost(navController = navController, startDestination = NavItem.Product.route) {
         composable(NavItem.Product.route) {
             hideNavigationBar(false)
-            ProductScreen(
-                navController = navController,
-                innerPadding
-            ) { _ ->
+            ProductScreen(innerPadding) { _ ->
                 navigateTo(navController, "addProduct")
             }
         }
