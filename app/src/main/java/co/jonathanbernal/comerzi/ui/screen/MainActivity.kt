@@ -1,6 +1,9 @@
 package co.jonathanbernal.comerzi.ui.screen
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -46,12 +49,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ViewContainer()
+            ViewContainer {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
         }
     }
 
     @Composable
-    private fun ViewContainer() {
+    private fun ViewContainer(openPermissionSettings: () -> Unit) {
         val navController = rememberNavController()
         var hideNavigationBar by remember {
             mutableStateOf(false)
@@ -59,9 +67,11 @@ class MainActivity : ComponentActivity() {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             content = { innerPadding ->
-                NavController(navController, innerPadding) {
+                NavController(navController, innerPadding, {
                     hideNavigationBar = it
-                }
+                }, {
+                    openPermissionSettings()
+                })
             },
             bottomBar = {
                 if (hideNavigationBar.not()) {
@@ -91,7 +101,8 @@ class MainActivity : ComponentActivity() {
 fun NavController(
     navController: NavHostController,
     innerPadding: PaddingValues,
-    hideNavigationBar: (Boolean) -> Unit
+    hideNavigationBar: (Boolean) -> Unit,
+    openPermissionSettings: () -> Unit
 ) {
     NavHost(navController = navController, startDestination = NavItem.Product.route) {
         composable(NavItem.Product.route) {
@@ -122,14 +133,16 @@ fun NavController(
         }
         composable("takePhoto") {
             hideNavigationBar(true)
-            CameraPreview(innerPadding = innerPadding) { uri ->
+            CameraPreview(innerPadding = innerPadding, { uri ->
                 navController.navigate("addProduct?uri=${uri}") {
                     launchSingleTop = true
                     popUpTo("takePhoto") {
                         inclusive = true
                     }
                 }
-            }
+            }, {
+                openPermissionSettings()
+            })
         }
     }
 }

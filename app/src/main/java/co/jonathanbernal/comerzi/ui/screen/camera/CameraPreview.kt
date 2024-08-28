@@ -15,8 +15,10 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -57,7 +59,8 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 @Composable
 fun CameraPreview(
     innerPadding: PaddingValues,
-    onUriChange: (Uri) -> Unit
+    onUriChange: (Uri) -> Unit,
+    openPermissionSettings: () -> Unit
 ) {
     val cameraPermissionState =
         rememberMultiplePermissionsState(permissions = permissionList)
@@ -76,7 +79,8 @@ fun CameraPreview(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(innerPadding)
+            .padding(innerPadding),
+        contentAlignment = Alignment.Center
     ) {
         val currentPhoto by cameraViewModel.photo.collectAsState()
         currentPhoto?.let { photo ->
@@ -87,7 +91,21 @@ fun CameraPreview(
                 cameraViewModel = cameraViewModel
             )
         } ?: run {
-            Camera(cameraViewModel, controller, applicationContext)
+            if (cameraPermissionState.allPermissionsGranted) {
+                Camera(cameraViewModel, controller, applicationContext)
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "Por favor concede todos los permisos para poder tomar fotos")
+                    Spacer(modifier = Modifier.size(16.dp))
+                    Button(onClick = { openPermissionSettings() }) {
+                        Text(text = "Conceder permisos")
+                    }
+                }
+            }
         }
     }
 }
