@@ -120,9 +120,9 @@ private fun SearchProduct(
                 .padding(8.dp),
             query = searchText,
             onQueryChange = { productViewModel.onSearchTextChange(it) },
-            onSearch = { productViewModel.onToogleSearch() },
+            onSearch = { Unit },
             active = false,
-            onActiveChange = { productViewModel.onToogleSearch() },
+            onActiveChange = { Unit },
             placeholder = {
                 Text(text = stringResource(id = R.string.search_product_hint))
             }

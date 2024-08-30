@@ -24,9 +24,6 @@ class ProductViewModel @Inject constructor(
     private val scanner: GmsBarcodeScanner
 ) : ViewModel() {
 
-    private val _isSearching = MutableStateFlow(false)
-    val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
-
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText.asStateFlow()
 
@@ -48,13 +45,6 @@ class ProductViewModel @Inject constructor(
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
-    }
-
-    fun onToogleSearch() {
-        _isSearching.value = !_isSearching.value
-        if (!_isSearching.value) {
-            onSearchTextChange("")
-        }
     }
 
     fun openScanner() {
