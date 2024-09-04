@@ -7,15 +7,14 @@ import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.useCases.CategoryUseCase
 import co.jonathanbernal.comerzi.useCases.ProductUseCase
 import co.jonathanbernal.comerzi.utils.orEmpty
-import co.jonathanbernal.comerzi.utils.toStateFlow
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanner
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -117,6 +116,10 @@ class AddProductViewModel @Inject constructor(
             _categorySelected
         ) { name, ean, price, photo, category ->
             name.isNotBlank() && ean.isNotBlank() && price.isNotBlank() && photo.isNotBlank() && category != null
-        }.toStateFlow(CoroutineScope(coroutineContext), false)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
 
 }

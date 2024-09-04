@@ -1,5 +1,6 @@
 package co.jonathanbernal.comerzi.ui.screen.product
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,13 +18,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -45,6 +50,7 @@ import coil.compose.AsyncImage
 import java.math.BigDecimal
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductScreen(
     innerPadding: PaddingValues,
@@ -54,8 +60,8 @@ fun ProductScreen(
     productViewModel.getAllProducts()
     Scaffold(
         modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .padding(innerPadding),
         content = { currentInnerPadding ->
             ContentProductList(productViewModel, currentInnerPadding)
         },
@@ -78,22 +84,59 @@ fun AddProduct(navigateTo: (Unit) -> Unit) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ContentProductList(productViewModel: ProductViewModel, innerPadding: PaddingValues) {
-    Box(
+    Column(
         modifier = Modifier
-            .padding(innerPadding)
             .fillMaxSize()
+            .padding(horizontal = 8.dp)
     ) {
+        SearchProduct(productViewModel)
         val products by productViewModel.products.collectAsState()
         ListProduct(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 8.dp)
-                .align(Alignment.TopStart),
+            modifier = Modifier,
             itemsCategory = products,
             onDeleteClick = { }
         )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun SearchProduct(
+    productViewModel: ProductViewModel
+) {
+    val searchText by productViewModel.searchText.collectAsState()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainerLow),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        SearchBar(
+            modifier = Modifier
+                .weight(5f)
+                .padding(8.dp),
+            query = searchText,
+            onQueryChange = { productViewModel.onSearchTextChange(it) },
+            onSearch = { Unit },
+            active = false,
+            onActiveChange = { Unit },
+            placeholder = {
+                Text(text = stringResource(id = R.string.search_product_hint))
+            }
+        ) {}
+        IconButton(
+            modifier = Modifier
+                .weight(1f)
+                .padding(8.dp),
+            onClick = { productViewModel.openScanner() }) {
+            Icon(
+                modifier = Modifier.fillMaxSize(),
+                imageVector = Icons.Default.QrCodeScanner, contentDescription = null
+            )
+        }
     }
 }
 

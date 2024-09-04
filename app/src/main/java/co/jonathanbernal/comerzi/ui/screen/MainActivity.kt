@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -142,7 +143,7 @@ fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(NavItem.Product, NavItem.Category)
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
-    BottomAppBar {
+    BottomAppBar(modifier = Modifier.wrapContentSize()) {
         NavigationBar {
             items.forEach { item ->
                 NavigationBarItem(

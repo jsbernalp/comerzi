@@ -21,4 +21,5 @@
     <string name="save_category_button_label">Guardar</string>
     <string name="cancel_edit_category_button_label">Cancelar</string>
     <string name="add_photo_button_label">Agregar Foto</string>
+    <string name="search_product_hint">Buscar producto</string>
 </resources>
