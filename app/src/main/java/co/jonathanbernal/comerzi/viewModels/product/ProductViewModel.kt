@@ -34,7 +34,7 @@ class ProductViewModel @Inject constructor(
                 products
             } else {
                 products.filter { product ->
-                    product.ean.contains(text, ignoreCase = true)
+                    isContain(product, text)
                 }
             }
         }.stateIn(
@@ -42,6 +42,15 @@ class ProductViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = _products.value
         )
+
+    private fun isContain(
+        product: Product,
+        text: String
+    ): Boolean {
+        val searchForEan = product.ean.contains(text, ignoreCase = true)
+        val searchForName = product.name.contains(text, ignoreCase = true)
+        return searchForEan || searchForName
+    }
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
