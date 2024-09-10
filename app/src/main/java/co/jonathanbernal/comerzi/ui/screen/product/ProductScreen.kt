@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,23 +20,26 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,9 +49,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.jonathanbernal.comerzi.R
 import co.jonathanbernal.comerzi.ui.models.Product
+import co.jonathanbernal.comerzi.utils.formatPrice
 import co.jonathanbernal.comerzi.viewModels.product.ProductViewModel
 import coil.compose.AsyncImage
-import java.math.BigDecimal
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -157,70 +161,15 @@ fun ListProduct(
 
 @Composable
 fun ItemProduct(item: Product, onDeleteClick: () -> Unit) {
-    ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(5.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 3.dp
-        )
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column {
-                AsyncImage(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    model = item.photo,
-                    contentDescription = "Image",
-                    placeholder = painterResource(id = R.drawable.baseline_warning_24),
-                    contentScale = ContentScale.Crop,
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextWithLabel(
-                        horizontalAlignment = Alignment.Start,
-                        labelValue = stringResource(id = R.string.label_product_name_card),
-                        textValue = item.name
-                    )
-                    TextWithLabel(
-                        horizontalAlignment = Alignment.End,
-                        labelValue = stringResource(id = R.string.label_product_price_card),
-                        textValue = BigDecimal(item.price).toString()
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextWithLabel(
-                        horizontalAlignment = Alignment.Start,
-                        labelValue = stringResource(id = R.string.label_product_ean_card),
-                        textValue = item.ean
-                    )
-                    TextWithLabel(
-                        horizontalAlignment = Alignment.End,
-                        labelValue = stringResource(id = R.string.label_product_category_card),
-                        textValue = item.category.name
-                    )
-                }
-            }
-        }
-    }
+    ProductCard(
+        productName = item.name.uppercase(),
+        productDescription = "test",
+        productPrice = item.price,
+        productImageUrl = item.photo,
+        productEan = item.ean,
+        productCategory = item.category.name.uppercase(),
+        onAddToCartClicked = onDeleteClick
+    )
 }
 
 @Composable
@@ -243,7 +192,7 @@ fun TextWithLabel(
 }
 
 
-@Preview(showBackground = true, widthDp = 320, heightDp = 340)
+@Preview
 @Composable
 fun ProductCardPreview() {
     ElevatedCard(
@@ -306,3 +255,116 @@ fun ProductCardPreview() {
         }
     }
 }
+
+
+@Preview(showBackground = true)
+@Composable
+fun SearchProductPreview() {
+    ProductCard(
+        productName = "test",
+        productDescription = "Test",
+        productPrice = 125.09,
+        productImageUrl = "www.google.com",
+        productEan = "123131231",
+        productCategory = "Aceites",
+    ) {}
+}
+
+
+@Composable
+fun ProductCard(
+    productName: String,
+    productDescription: String,
+    productPrice: Double,
+    productImageUrl: String,
+    productCategory: String,
+    productEan: String,
+    onAddToCartClicked: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
+        ),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                model = productImageUrl,
+                contentDescription = "Image",
+                placeholder = painterResource(id = R.drawable.baseline_warning_24),
+                contentScale = ContentScale.Crop,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = productName,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp)
+                    .padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                thickness = 1.dp,
+                color = Color.Gray.copy(alpha = 0.3f)
+            )
+
+            Row(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(3f)
+                        .padding(end = 8.dp)
+                ) {
+                    TextWithLabel(
+                        horizontalAlignment = Alignment.Start,
+                        labelValue = "Categoria",
+                        textValue = "$productCategory"
+                    )
+                    TextWithLabel(
+                        horizontalAlignment = Alignment.Start,
+                        labelValue = "EAN",
+                        textValue = "$productEan"
+                    )
+                }
+                VerticalDivider(
+                    modifier = Modifier
+                        .height(100.dp)
+                        .padding(vertical = 8.dp),
+                    thickness = 1.dp,
+                    color = Color.Gray.copy(alpha = 0.3f)
+                )
+                Text(
+                    modifier = Modifier
+                        .weight(2f)
+                        .padding(start = 8.dp),
+                    text = "$${formatPrice(productPrice)}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+
+            }
+        }
+    }
+}
+
