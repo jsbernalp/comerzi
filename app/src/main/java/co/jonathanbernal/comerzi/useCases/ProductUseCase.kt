@@ -50,6 +50,10 @@ class ProductUseCase @Inject constructor(
             list.toProducts()
         }*/
 
+    suspend fun deleteProduct(product: Product) {
+        productRepository.deleteProduct(product.idProduct)
+    }
+
     fun getAllCategoriesWithProducts(): Flow<List<Product>> {
         return categoryRepository.getAllCategoriesWithProducts().map {
             it.flatMap { categoryWithProducts ->

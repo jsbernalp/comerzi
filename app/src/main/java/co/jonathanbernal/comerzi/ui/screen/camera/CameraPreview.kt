@@ -46,10 +46,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import co.jonathanbernal.comerzi.R
 import co.jonathanbernal.comerzi.ui.screen.common.permissionList
 import co.jonathanbernal.comerzi.viewModels.camera.CameraViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -99,10 +101,10 @@ fun CameraPreview(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "Por favor concede todos los permisos para poder tomar fotos")
+                    Text(text = stringResource(R.string.request_permissions))
                     Spacer(modifier = Modifier.size(16.dp))
                     Button(onClick = { openPermissionSettings() }) {
-                        Text(text = "Conceder permisos")
+                        Text(text = stringResource(R.string.grant_permissions))
                     }
                 }
             }
@@ -192,6 +194,19 @@ fun ImageCaptured(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
+
+            Button(
+                onClick = { cameraViewModel.updateTakePhoto(null) },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
+            ) {
+                Icon(
+                    modifier = Modifier.padding(end = 8.dp),
+                    imageVector = Icons.Default.Cancel,
+                    contentDescription = stringResource(id = R.string.cancel_button_label)
+                )
+                Text(text = stringResource(id = R.string.cancel_button_label))
+            }
+
             Button(onClick = {
                 cameraViewModel.storePhotoInGallery() { uri ->
                     onUriChange.invoke(uri)
@@ -201,21 +216,9 @@ fun ImageCaptured(
                 Icon(
                     modifier = Modifier.padding(end = 8.dp),
                     imageVector = Icons.Default.SaveAlt,
-                    contentDescription = "Guardar"
+                    contentDescription = stringResource(id = R.string.save_button_label)
                 )
-                Text(text = "Guardar")
-            }
-
-            Button(
-                onClick = { cameraViewModel.updateTakePhoto(null) },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
-            ) {
-                Icon(
-                    modifier = Modifier.padding(end = 8.dp),
-                    imageVector = Icons.Default.Cancel,
-                    contentDescription = "Cancelar"
-                )
-                Text(text = "Cancelar")
+                Text(text = stringResource(id = R.string.save_button_label))
             }
         }
     }

@@ -8,6 +8,7 @@ import co.jonathanbernal.comerzi.ui.models.Product
     map { it.toProduct() }*/
 
 fun ProductTable.toProduct(category: CategoryTable) = Product(
+    idProduct = idProduct,
     name = name,
     ean = ean,
     price = price,

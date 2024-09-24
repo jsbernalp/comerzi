@@ -12,13 +12,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,30 +31,42 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.jonathanbernal.comerzi.R
+import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.ui.models.Product
 import co.jonathanbernal.comerzi.viewModels.product.ProductViewModel
 import coil.compose.AsyncImage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductScreen(
     innerPadding: PaddingValues,
@@ -62,8 +78,8 @@ fun ProductScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding),
-        content = { currentInnerPadding ->
-            ContentProductList(productViewModel, currentInnerPadding)
+        content = { _ ->
+            ContentProductList(productViewModel)
         },
         floatingActionButton = { AddProduct(navigateTo) },
         floatingActionButtonPosition = FabPosition.End
@@ -86,7 +102,12 @@ fun AddProduct(navigateTo: (Unit) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ContentProductList(productViewModel: ProductViewModel, innerPadding: PaddingValues) {
+private fun ContentProductList(
+    productViewModel: ProductViewModel
+) {
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -97,8 +118,102 @@ private fun ContentProductList(productViewModel: ProductViewModel, innerPadding:
         ListProduct(
             modifier = Modifier,
             itemsCategory = products,
-            onDeleteClick = { }
+            onDeleteClick = {
+                showBottomSheet = true
+                productViewModel.updateProductSelected(it)
+            }
         )
+    }
+
+    if (showBottomSheet) {
+        DeleteDialog(productViewModel, sheetState, scope) {
+            showBottomSheet = it
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun DeleteDialog(
+    productViewModel: ProductViewModel,
+    sheetState: SheetState,
+    scope: CoroutineScope,
+    showBottomSheet: (Boolean) -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = {
+            productViewModel.updateProductSelected(null)
+            showBottomSheet(false)
+        },
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                stringResource(id = R.string.delete_product_title),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                CustomButton(
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
+                    icon = Icons.Default.Cancel,
+                    textButton = stringResource(R.string.cancel_button_label)
+                ) {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            productViewModel.updateProductSelected(null)
+                            showBottomSheet(false)
+                        }
+                    }
+                }
+                CustomButton(
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError,
+                        disabledContainerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
+                        disabledContentColor = MaterialTheme.colorScheme.onError.copy(alpha = 0.5f)
+                    ),
+                    icon = Icons.Default.Delete,
+                    textButton = stringResource(R.string.delete_button_label)
+                ) {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            productViewModel.deleteProduct()
+                            showBottomSheet(false)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomButton(colors: ButtonColors, icon: ImageVector, textButton: String, onClick: () -> Unit) {
+    Button(
+        onClick = {
+            onClick()
+        }, colors = colors
+    ) {
+        Icon(
+            modifier = Modifier.padding(end = 8.dp),
+            imageVector = icon,
+            contentDescription = null
+        )
+        Text(textButton)
     }
 }
 
@@ -156,7 +271,7 @@ fun ListProduct(
 }
 
 @Composable
-fun ItemProduct(item: Product, onDeleteClick: () -> Unit) {
+fun ItemProduct(item: Product, onDeleteClick: (Product) -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -218,6 +333,12 @@ fun ItemProduct(item: Product, onDeleteClick: () -> Unit) {
                         textValue = item.category.name
                     )
                 }
+                IconButton(
+                    onClick = { onDeleteClick(item) },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Icon(imageVector = Icons.Filled.Delete, contentDescription = null)
+                }
             }
         }
     }
@@ -243,66 +364,15 @@ fun TextWithLabel(
 }
 
 
-@Preview(showBackground = true, widthDp = 320, heightDp = 340)
+@Preview(showBackground = true, widthDp = 320, heightDp = 440)
 @Composable
 fun ProductCardPreview() {
-    ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(5.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 3.dp
-        )
-    ) {
-        Box(
-            modifier = Modifier
-                .wrapContentSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column {
-                Icon(
-                    painterResource(id = R.drawable.baseline_warning_24),
-                    contentDescription = "warning",
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextWithLabel(
-                        horizontalAlignment = Alignment.Start,
-                        labelValue = "Producto",
-                        textValue = "Terpel 20w - 50"
-                    )
-                    TextWithLabel(
-                        horizontalAlignment = Alignment.End,
-                        labelValue = "Precio",
-                        textValue = "$10098172398173871"
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextWithLabel(
-                        horizontalAlignment = Alignment.Start,
-                        labelValue = "EAN",
-                        textValue = "123456789"
-                    )
-                    TextWithLabel(
-                        horizontalAlignment = Alignment.End,
-                        labelValue = "Categoria",
-                        textValue = "Aceites"
-                    )
-                }
-            }
-        }
-    }
+    val itemProduct = Product(
+        name = "Product 1",
+        ean = "123456789",
+        price = 100.0,
+        photo = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+        category = Category("Category 1", id = 1)
+    )
+    ItemProduct(itemProduct, onDeleteClick = {})
 }

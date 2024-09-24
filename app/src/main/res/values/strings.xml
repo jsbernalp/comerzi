@@ -22,4 +22,10 @@
     <string name="cancel_edit_category_button_label">Cancelar</string>
     <string name="add_photo_button_label">Agregar Foto</string>
     <string name="search_product_hint">Buscar producto</string>
+    <string name="save_button_label">Guardar</string>
+    <string name="cancel_button_label">Cancelar</string>
+    <string name="request_permissions">Por favor concede todos los permisos para poder tomar fotos</string>
+    <string name="grant_permissions">Conceder permisos</string>
+    <string name="delete_product_title">¿Estás seguro de eliminar este producto?</string>
+    <string name="delete_button_label">Eliminar</string>
 </resources>

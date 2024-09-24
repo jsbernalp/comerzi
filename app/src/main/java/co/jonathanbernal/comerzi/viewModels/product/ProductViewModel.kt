@@ -20,32 +20,32 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
-    private val productUseCase: ProductUseCase,
-    private val scanner: GmsBarcodeScanner
+    private val productUseCase: ProductUseCase, private val scanner: GmsBarcodeScanner
 ) : ViewModel() {
 
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText.asStateFlow()
 
+    private val _productSelected = MutableStateFlow<Product?>(null)
+    val productSelected: StateFlow<Product?> = _productSelected.asStateFlow()
+
     private val _products = MutableStateFlow(listOf<Product>())
-    val products: StateFlow<List<Product>> =
-        searchText.combine(_products) { text, products ->
-            if (text.isBlank()) {
-                products
-            } else {
-                products.filter { product ->
-                    isContain(product, text)
-                }
+    val products: StateFlow<List<Product>> = searchText.combine(_products) { text, products ->
+        if (text.isBlank()) {
+            products
+        } else {
+            products.filter { product ->
+                isContain(product, text)
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = _products.value
-        )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = _products.value
+    )
 
     private fun isContain(
-        product: Product,
-        text: String
+        product: Product, text: String
     ): Boolean {
         val searchForEan = product.ean.contains(text, ignoreCase = true)
         val searchForName = product.name.contains(text, ignoreCase = true)
@@ -57,13 +57,23 @@ class ProductViewModel @Inject constructor(
     }
 
     fun openScanner() {
-        scanner.startScan()
-            .addOnSuccessListener { barcode ->
-                onSearchTextChange(barcode.displayValue.orEmpty())
+        scanner.startScan().addOnSuccessListener { barcode ->
+            onSearchTextChange(barcode.displayValue.orEmpty())
+        }.addOnFailureListener { e ->
+            Log.e("Scanner", e.message.orEmpty())
+        }
+    }
+
+    fun updateProductSelected(product: Product?) {
+        _productSelected.value = product
+    }
+
+    fun deleteProduct() {
+        viewModelScope.launch {
+            productSelected.value?.let { product ->
+                productUseCase.deleteProduct(product)
             }
-            .addOnFailureListener { e ->
-                Log.e("Scanner", e.message.orEmpty())
-            }
+        }
     }
 
     fun getAllProducts() {
