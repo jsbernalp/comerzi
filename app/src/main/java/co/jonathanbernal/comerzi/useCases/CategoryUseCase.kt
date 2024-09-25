@@ -1,20 +1,33 @@
 package co.jonathanbernal.comerzi.useCases
 
-import co.jonathanbernal.comerzi.network.CategoryRepository
-import co.jonathanbernal.comerzi.network.models.RequestCategory
-import co.jonathanbernal.comerzi.network.models.ResponseCategory
+import co.jonathanbernal.comerzi.datasource.CategoryRepository
+import co.jonathanbernal.comerzi.datasource.local.mapper.toCategories
+import co.jonathanbernal.comerzi.datasource.local.mapper.toCategoryTable
+import co.jonathanbernal.comerzi.datasource.local.models.CategoryTable
+import co.jonathanbernal.comerzi.ui.models.Category
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class CategoryUseCase @Inject constructor(
     private val categoryRepository: CategoryRepository
 ) {
 
-    suspend fun saveNewCategory(name: String): ResponseCategory {
-       return categoryRepository.saveNewCategory(getRequestCategory(name))
+    fun getAllCategories(): Flow<List<Category>> {
+        return categoryRepository.getAllCategories().map {
+            it.toCategories()
+        }
     }
 
-    private fun getRequestCategory(name: String): RequestCategory {
-        return RequestCategory(name)
+    suspend fun addCategory(categoryName: String): Result<Unit> {
+        return categoryRepository.addCategory(CategoryTable(categoryName = categoryName.uppercase()))
     }
 
+    suspend fun updateCategory(category: Category) {
+        categoryRepository.updateCategory(category.toCategoryTable())
+    }
+
+    suspend fun deleteCategoryFromDb(id: Int) {
+        categoryRepository.deleteCategoryFromDb(id)
+    }
 }

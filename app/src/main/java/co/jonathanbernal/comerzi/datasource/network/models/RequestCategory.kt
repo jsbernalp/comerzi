@@ -1,4 +1,4 @@
-package co.jonathanbernal.comerzi.network.models
+package co.jonathanbernal.comerzi.datasource.network.models
 
 import com.google.gson.annotations.SerializedName
 
@@ -7,6 +7,6 @@ data class RequestCategory(
 )
 
 data class ResponseCategory(
-    @SerializedName("id") val id: String,
+    @SerializedName("id") val id: Int,
     @SerializedName("categoryName") val categoryName: String
 )
