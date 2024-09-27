@@ -3,6 +3,7 @@ agp = "8.5.1"
 cameraX = "1.4.0-rc01"
 coilCompose = "2.7.0"
 converterGson = "2.9.0"
+firebaseBom = "33.3.0"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -29,7 +30,8 @@ playServicesCodeScanner = "16.1.0"
 retrofit = "2.11.0"
 okhttpVersion = "4.9.1"
 roomRuntime = "2.6.1"
-
+googleServicesVersion = "4.4.2"
+firebaseCrashlyticsGradleVersion = "2.9.5"
 
 
 [libraries]
@@ -47,6 +49,10 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRunt
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -83,6 +89,8 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 daggerHiltAndroidPlugin = { id = "com.google.dagger.hilt.android", version.ref = "daggerHiltAndroid" }
 kspPlugin = { id = "com.google.devtools.ksp", version.ref = "ksp_version" }
+googleServicesPlugin = { id = "com.google.gms.google-services", version.ref = "googleServicesVersion" }
+firebaseCrashlyticsGradleVersion = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsGradleVersion" }
 
 
 

@@ -1,25 +1,18 @@
 package co.jonathanbernal.comerzi.datasource.local.mapper
 
-import co.jonathanbernal.comerzi.datasource.local.models.CategoryTable
+import co.jonathanbernal.comerzi.datasource.network.models.FireStoreCategoryResponse
 import co.jonathanbernal.comerzi.ui.models.Category
+import java.util.Date
 
 
-fun List<CategoryTable>.toCategories(): List<Category> {
-    return this.map { it.toCategory() }
+fun List<FireStoreCategoryResponse>.toCategoriesModel(): List<Category> {
+    return this.map { it.toCategoryModel() }
 }
 
-fun CategoryTable.toCategory(): Category {
+fun FireStoreCategoryResponse.toCategoryModel(): Category {
     return Category(
         id = this.idCategory,
-        name = this.categoryName,
-        date = this.date
-    )
-}
-
-
-fun Category.toCategoryTable(): CategoryTable {
-    return CategoryTable(
-        idCategory = this.id,
-        categoryName = this.name.uppercase(),
+        name = this.name,
+        date = Date()
     )
 }

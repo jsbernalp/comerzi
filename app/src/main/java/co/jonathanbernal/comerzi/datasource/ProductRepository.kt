@@ -1,6 +1,5 @@
 package co.jonathanbernal.comerzi.datasource
 
-import co.jonathanbernal.comerzi.datasource.local.dao.CategoryDao
 import co.jonathanbernal.comerzi.datasource.local.dao.ProductDao
 import co.jonathanbernal.comerzi.datasource.local.models.ProductTable
 import kotlinx.coroutines.Dispatchers
@@ -11,7 +10,6 @@ import javax.inject.Inject
 
 class ProductRepository @Inject constructor(
     private val productDao: ProductDao,
-    private val categoryDao: CategoryDao
 ) {
     suspend fun addProduct(product: ProductTable) = productDao.insertProduct(product)
     suspend fun getProductByEan(ean: String): ProductTable? = productDao.getProductByEan(ean)

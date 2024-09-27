@@ -1,38 +1,38 @@
 package co.jonathanbernal.comerzi.datasource
 
-import co.jonathanbernal.comerzi.datasource.local.dao.CategoryDao
-import co.jonathanbernal.comerzi.datasource.local.models.CategoryTable
-import co.jonathanbernal.comerzi.datasource.local.models.CategoryWIthProducts
-import kotlinx.coroutines.Dispatchers
+import co.jonathanbernal.comerzi.datasource.network.firestoreApi.CategoryFireStoreApi
+import co.jonathanbernal.comerzi.datasource.network.models.FireStoreCategory
+import co.jonathanbernal.comerzi.datasource.network.models.FireStoreCategoryResponse
+import co.jonathanbernal.comerzi.ui.models.Category
+import com.google.firebase.firestore.DocumentReference
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.single
 import javax.inject.Inject
 
 class CategoryRepository @Inject constructor(
-    private val categoryDao: CategoryDao
+    private val categoryFireStoreApi: CategoryFireStoreApi
 ) {
 
-    suspend fun addCategory(category: CategoryTable): Result<Unit> {
-        val isExist = categoryDao.getCategoryByName(category.categoryName)
-        return isExist?.let {
+    suspend fun updateCategoryFromFireStore(category: Category): Flow<Result<Void>> {
+        return categoryFireStoreApi.updateCategory(category)
+    }
+
+    suspend fun deleteCategoryFromFireStore(idCategory: String): Flow<Result<Void>> {
+        return categoryFireStoreApi.deleteCategory(idCategory)
+    }
+
+    suspend fun addCategoryToFireStore(category: FireStoreCategory): Result<DocumentReference> {
+        val isExist: Boolean =
+            categoryFireStoreApi.getCategory(category.name).map { it.isNotEmpty() }.single()
+        return if (isExist) {
             Result.failure(Exception("Category already exists"))
-        } ?: run {
-            Result.success(categoryDao.insertCategory(category))
+        } else {
+            categoryFireStoreApi.addCategory(category).single()
         }
     }
 
-    suspend fun updateCategory(category: CategoryTable) =
-        categoryDao.updateCategory(category)
-
-    suspend fun deleteCategoryFromDb(id: Int) =
-        categoryDao.deleteCategory(id)
-
-    suspend fun deleteAllCategories() = categoryDao.deleteAllCategories()
-
-    fun getAllCategories(): Flow<List<CategoryTable>> =
-        categoryDao.getAllCategories().flowOn(Dispatchers.IO).conflate()
-
-    fun getAllCategoriesWithProducts(): Flow<List<CategoryWIthProducts>> =
-        categoryDao.getAllCategoriesWithProducts().flowOn(Dispatchers.IO).conflate()
+    suspend fun getCategoriesFromFireStore(): Flow<List<FireStoreCategoryResponse>> {
+        return categoryFireStoreApi.getCategories()
+    }
 }

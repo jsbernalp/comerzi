@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -69,16 +70,17 @@ class AddProductViewModel @Inject constructor(
 
     fun getCategories() {
         viewModelScope.launch {
-            categoryUseCase.getAllCategories().collect { categories ->
-                _categories.value = categories
-                _warningCategories.value = categories.isEmpty()
-            }
+            categoryUseCase.getAllFireStoreCategories().distinctUntilChanged()
+                .collect { listOfCategories ->
+                    _categories.value = listOfCategories
+                    _warningCategories.value = listOfCategories.isEmpty()
+                }
         }
     }
 
     fun saveProduct(callback: (Unit) -> Unit) {
         viewModelScope.launch {
-            productUseCase.addProduct(
+           /* productUseCase.addProduct(
                 _productName.value,
                 _productEan.value,
                 _productPrice.value.toDouble(),
@@ -93,7 +95,7 @@ class AddProductViewModel @Inject constructor(
                     callback.invoke(Unit)
                 },
                 onFailure = {}
-            )
+            )*/
         }
     }
 

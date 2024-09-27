@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.daggerHiltAndroidPlugin)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kspPlugin)
+    alias(libs.plugins.googleServicesPlugin)
+    alias(libs.plugins.firebaseCrashlyticsGradleVersion)
 }
 
 android {
@@ -134,4 +136,9 @@ dependencies {
     //Glide
     implementation(libs.coil.compose)
 
+    //Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.firestore)
+    implementation (libs.firebase.crashlytics)
 }

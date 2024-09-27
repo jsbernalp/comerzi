@@ -372,7 +372,7 @@ fun ProductCardPreview() {
         ean = "123456789",
         price = 100.0,
         photo = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
-        category = Category("Category 1", id = 1)
+        category = Category("Category 1", id = "1")
     )
     ItemProduct(itemProduct, onDeleteClick = {})
 }

@@ -78,11 +78,11 @@ class ProductViewModel @Inject constructor(
 
     fun getAllProducts() {
         viewModelScope.launch {
-            productUseCase.getAllCategoriesWithProducts().distinctUntilChanged()
+           /* productUseCase.getAllCategoriesWithProducts().distinctUntilChanged()
                 .collect { productList ->
                     _products.value = emptyList()
                     _products.value = productList
-                }
+                }*/
         }
     }
 }

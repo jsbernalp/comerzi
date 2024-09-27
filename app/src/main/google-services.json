@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "863241130497",
+    "project_id": "comerzi-a5043",
+    "storage_bucket": "comerzi-a5043.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863241130497:android:790e930d28bb88ec60a600",
+        "android_client_info": {
+          "package_name": "co.jonathanbernal.comerzi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCl9ewqsyIHMfMim5RQdEgcxbmkEMZZ2FU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

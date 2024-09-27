@@ -1,10 +1,10 @@
 package co.jonathanbernal.comerzi.useCases
 
 import co.jonathanbernal.comerzi.datasource.CategoryRepository
-import co.jonathanbernal.comerzi.datasource.local.mapper.toCategories
-import co.jonathanbernal.comerzi.datasource.local.mapper.toCategoryTable
-import co.jonathanbernal.comerzi.datasource.local.models.CategoryTable
+import co.jonathanbernal.comerzi.datasource.local.mapper.toCategoriesModel
+import co.jonathanbernal.comerzi.datasource.network.models.FireStoreCategory
 import co.jonathanbernal.comerzi.ui.models.Category
+import com.google.firebase.firestore.DocumentReference
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -13,21 +13,23 @@ class CategoryUseCase @Inject constructor(
     private val categoryRepository: CategoryRepository
 ) {
 
-    fun getAllCategories(): Flow<List<Category>> {
-        return categoryRepository.getAllCategories().map {
-            it.toCategories()
+    suspend fun getAllFireStoreCategories(): Flow<List<Category>> {
+        return categoryRepository.getCategoriesFromFireStore().map {
+            it.toCategoriesModel()
         }
     }
 
-    suspend fun addCategory(categoryName: String): Result<Unit> {
-        return categoryRepository.addCategory(CategoryTable(categoryName = categoryName.uppercase()))
+    suspend fun addCategoryToFireStore(categoryName: String): Result<DocumentReference> {
+        return categoryRepository.addCategoryToFireStore(
+            FireStoreCategory(name = categoryName.uppercase())
+        )
     }
 
-    suspend fun updateCategory(category: Category) {
-        categoryRepository.updateCategory(category.toCategoryTable())
+    suspend fun deleteCategoryToFireStore(idCategory: String): Flow<Result<Void>> {
+        return categoryRepository.deleteCategoryFromFireStore(idCategory)
     }
 
-    suspend fun deleteCategoryFromDb(id: Int) {
-        categoryRepository.deleteCategoryFromDb(id)
+    suspend fun updateCategoryFromFireStore(category: Category): Flow<Result<Void>> {
+        return categoryRepository.updateCategoryFromFireStore(category)
     }
 }

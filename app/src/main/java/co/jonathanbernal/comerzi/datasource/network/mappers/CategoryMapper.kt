@@ -8,5 +8,5 @@ fun List<ResponseCategory>.toCategories(): List<Category> {
 }
 
 fun ResponseCategory.toMap(): Category {
-    return Category(id = this.id, name = this.categoryName)
+    return Category(id = this.id.toString(), name = this.categoryName)
 }

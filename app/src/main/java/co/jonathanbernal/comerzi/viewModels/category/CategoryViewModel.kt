@@ -8,12 +8,14 @@ import co.jonathanbernal.comerzi.useCases.CategoryUseCase
 import co.jonathanbernal.comerzi.utils.toStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.fold
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,7 +43,7 @@ class CategoryViewModel @Inject constructor(
 
     fun getAllCategories() {
         viewModelScope.launch {
-            categoryUseCase.getAllCategories().distinctUntilChanged()
+            categoryUseCase.getAllFireStoreCategories().distinctUntilChanged()
                 .collect { listOfCategories ->
                     _categories.value = listOfCategories
                 }
@@ -50,37 +52,51 @@ class CategoryViewModel @Inject constructor(
 
     fun addCategory() {
         viewModelScope.launch {
-            categoryUseCase.addCategory(_category.value)
-                .fold(
-                    onSuccess = {
-                        newCategoryName("")
-                    },
-                    onFailure = {
-                        Log.e("CategoryViewModel", "Error al agregar la categoria", it)
-                    }
-                )
+            categoryUseCase.addCategoryToFireStore(_category.value).fold(
+                onSuccess = {
+                    _category.value = ""
+                    getAllCategories()
+                },
+                onFailure = {
+                    Log.e("CategoryViewModel", "Error adding category", it)
+                }
+            )
         }
     }
 
-    fun deleteCategory(id: Int) {
+    fun deleteCategory(id: String) {
         viewModelScope.launch {
-            categoryUseCase.deleteCategoryFromDb(id)
+            categoryUseCase.deleteCategoryToFireStore(id).collect { result ->
+                result.onSuccess {
+                    getAllCategories()
+                }
+                result.onFailure {
+                    Log.e("CategoryViewModel", "Error deleting category", it)
+                }
+            }
         }
     }
 
     fun saveEditCategory() {
         viewModelScope.launch {
             _editCategory.value?.let { category ->
-                categoryUseCase.updateCategory(category)
-                editCategory(null)
+                categoryUseCase.updateCategoryFromFireStore(category).collect { result ->
+                    result.onSuccess {
+                        editCategory(null)
+                        getAllCategories()
+                    }
+                    result.onFailure {
+                        Log.e("CategoryViewModel", "Error deleting category", it)
+                    }
+                }
             }
         }
     }
 
-    val buttonEnabled: StateFlow<Boolean> =
-        combine(
-            _category
-        ) { categoryValue ->
-            categoryValue.first().isNotBlank()
-        }.toStateFlow(CoroutineScope(coroutineContext), false)
+    @OptIn(DelicateCoroutinesApi::class)
+    val buttonEnabled: StateFlow<Boolean> = combine(
+        _category
+    ) { categoryValue ->
+        categoryValue.first().isNotBlank()
+    }.toStateFlow(CoroutineScope(coroutineContext), false)
 }
