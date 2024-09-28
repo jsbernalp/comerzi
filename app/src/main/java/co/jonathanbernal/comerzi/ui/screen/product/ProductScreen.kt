@@ -60,6 +60,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import co.jonathanbernal.comerzi.R
 import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.ui.models.Product
+import co.jonathanbernal.comerzi.utils.orEmpty
 import co.jonathanbernal.comerzi.viewModels.product.ProductViewModel
 import coil.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
@@ -330,7 +331,7 @@ fun ItemProduct(item: Product, onDeleteClick: (Product) -> Unit) {
                     TextWithLabel(
                         horizontalAlignment = Alignment.End,
                         labelValue = stringResource(id = R.string.label_product_category_card),
-                        textValue = item.category.name
+                        textValue = item.category?.name.orEmpty()
                     )
                 }
                 IconButton(

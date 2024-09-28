@@ -14,11 +14,11 @@ class CategoryRepository @Inject constructor(
     private val categoryFireStoreApi: CategoryFireStoreApi
 ) {
 
-    suspend fun updateCategoryFromFireStore(category: Category): Flow<Result<Void>> {
+     fun updateCategoryFromFireStore(category: Category): Flow<Result<Void>> {
         return categoryFireStoreApi.updateCategory(category)
     }
 
-    suspend fun deleteCategoryFromFireStore(idCategory: String): Flow<Result<Void>> {
+     fun deleteCategoryFromFireStore(idCategory: String): Flow<Result<Void>> {
         return categoryFireStoreApi.deleteCategory(idCategory)
     }
 
@@ -32,7 +32,7 @@ class CategoryRepository @Inject constructor(
         }
     }
 
-    suspend fun getCategoriesFromFireStore(): Flow<List<FireStoreCategoryResponse>> {
+     fun getCategoriesFromFireStore(): Flow<List<FireStoreCategoryResponse>> {
         return categoryFireStoreApi.getCategories()
     }
 }

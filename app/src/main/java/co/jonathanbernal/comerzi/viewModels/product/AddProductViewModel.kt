@@ -51,9 +51,6 @@ class AddProductViewModel @Inject constructor(
     private val _photo = MutableStateFlow<String>("")
     val photo: StateFlow<String> = _photo.asStateFlow()
 
-    private val _openCamera = MutableStateFlow(false)
-    val openCamera: StateFlow<Boolean> = _openCamera.asStateFlow()
-
     fun updateProductData(value: Any?, fieldType: FieldType) {
         when (fieldType) {
             FieldType.NAME -> _productName.value = value as String
@@ -62,10 +59,6 @@ class AddProductViewModel @Inject constructor(
             FieldType.CATEGORY -> _categorySelected.value = value as Category?
             FieldType.PHOTO -> _photo.value = value as String
         }
-    }
-
-    fun openCamera(newValue: Boolean) {
-        _openCamera.value = newValue
     }
 
     fun getCategories() {
@@ -80,22 +73,26 @@ class AddProductViewModel @Inject constructor(
 
     fun saveProduct(callback: (Unit) -> Unit) {
         viewModelScope.launch {
-           /* productUseCase.addProduct(
-                _productName.value,
-                _productEan.value,
-                _productPrice.value.toDouble(),
-                _photo.value.toString(),
-                _categorySelected.value
-            ).fold(
-                onSuccess = {
-                    updateProductData("", FieldType.NAME)
-                    updateProductData("", FieldType.EAN)
-                    updateProductData("", FieldType.PRICE)
-                    updateProductData(null, FieldType.CATEGORY)
-                    callback.invoke(Unit)
-                },
-                onFailure = {}
-            )*/
+            _categorySelected.value?.let { categoryValue ->
+                productUseCase.addProduct(
+                    _productName.value,
+                    _productEan.value,
+                    _productPrice.value.toDouble(),
+                    _photo.value,
+                    categoryValue
+                ).collect { result ->
+                    result.onSuccess {
+                        updateProductData("", FieldType.NAME)
+                        updateProductData("", FieldType.EAN)
+                        updateProductData("", FieldType.PRICE)
+                        updateProductData(null, FieldType.CATEGORY)
+                        callback.invoke(Unit)
+                    }
+                    result.onFailure {
+                        Log.e("AddProductViewModel", "Error adding product", it)
+                    }
+                }
+            }
         }
     }
 

@@ -27,7 +27,7 @@ class ProductViewModel @Inject constructor(
     val searchText: StateFlow<String> = _searchText.asStateFlow()
 
     private val _productSelected = MutableStateFlow<Product?>(null)
-    val productSelected: StateFlow<Product?> = _productSelected.asStateFlow()
+    private val productSelected: StateFlow<Product?> = _productSelected.asStateFlow()
 
     private val _products = MutableStateFlow(listOf<Product>())
     val products: StateFlow<List<Product>> = searchText.combine(_products) { text, products ->
@@ -71,18 +71,26 @@ class ProductViewModel @Inject constructor(
     fun deleteProduct() {
         viewModelScope.launch {
             productSelected.value?.let { product ->
-                productUseCase.deleteProduct(product)
+                productUseCase.deleteProduct(product.idProduct).collect { result ->
+                    result.onSuccess {
+                        updateProductSelected(null)
+                        getAllProducts()
+                    }
+                    result.onFailure {
+                        Log.e("ProductViewModel", "Error deleting product", it)
+                    }
+                }
             }
         }
     }
 
     fun getAllProducts() {
         viewModelScope.launch {
-           /* productUseCase.getAllCategoriesWithProducts().distinctUntilChanged()
+            productUseCase.getProducts().distinctUntilChanged()
                 .collect { productList ->
                     _products.value = emptyList()
                     _products.value = productList
-                }*/
+                }
         }
     }
 }

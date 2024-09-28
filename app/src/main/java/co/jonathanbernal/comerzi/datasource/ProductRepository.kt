@@ -1,22 +1,26 @@
 package co.jonathanbernal.comerzi.datasource
 
-import co.jonathanbernal.comerzi.datasource.local.dao.ProductDao
-import co.jonathanbernal.comerzi.datasource.local.models.ProductTable
-import kotlinx.coroutines.Dispatchers
+import co.jonathanbernal.comerzi.datasource.network.firestoreApi.ProductFireStoreApi
+import co.jonathanbernal.comerzi.datasource.network.models.FireStoreProduct
+import co.jonathanbernal.comerzi.datasource.network.models.FireStoreProductResponse
+import com.google.firebase.firestore.DocumentReference
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class ProductRepository @Inject constructor(
-    private val productDao: ProductDao,
+    private val productFireStoreApi: ProductFireStoreApi
 ) {
-    suspend fun addProduct(product: ProductTable) = productDao.insertProduct(product)
-    suspend fun getProductByEan(ean: String): ProductTable? = productDao.getProductByEan(ean)
-    suspend fun deleteProduct(id: Int) = productDao.deleteProduct(id)
-    suspend fun deleteAllProducts() = productDao.deleteAllProducts()
 
-    fun getAllProducts(): Flow<List<ProductTable>> =
-        productDao.getAllProducts().flowOn(Dispatchers.IO).distinctUntilChanged()
+    fun deleteProductFromFireStore(idProduct: String): Flow<Result<Void>> {
+        return productFireStoreApi.deleteProduct(idProduct)
+    }
+
+    fun addProductToFireStore(product: FireStoreProduct): Flow<Result<DocumentReference>> {
+       return productFireStoreApi.addProduct(product)
+    }
+
+    fun getProductsFromFireStore(): Flow<List<FireStoreProductResponse>> {
+        return productFireStoreApi.getProducts()
+    }
 
 }

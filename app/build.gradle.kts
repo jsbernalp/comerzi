@@ -106,13 +106,6 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.loggingInterceptor)
 
-    //Room
-
-    implementation(libs.androidx.room.runtime)
-    annotationProcessor(libs.androidx.room.compiler)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
-
     //Scanner
     implementation (libs.play.services.code.scanner)
 

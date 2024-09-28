@@ -6,5 +6,6 @@ data class FireStoreCategoryResponse(
 )
 
 data class FireStoreCategory(
+    val id: String? = null,
     val name: String
 )
