@@ -2,7 +2,7 @@ package co.jonathanbernal.comerzi.useCases
 
 import co.jonathanbernal.comerzi.datasource.CategoryRepository
 import co.jonathanbernal.comerzi.datasource.ProductRepository
-import co.jonathanbernal.comerzi.datasource.network.mappers.toFireStoreCategory
+import co.jonathanbernal.comerzi.datasource.network.mappers.toCategoriesModel
 import co.jonathanbernal.comerzi.datasource.network.mappers.toProductModelList
 import co.jonathanbernal.comerzi.datasource.network.models.FireStoreProduct
 import co.jonathanbernal.comerzi.ui.models.Category
@@ -32,8 +32,13 @@ class ProductUseCase @Inject constructor(
         return productRepository.addProductToFireStore(product)
     }
 
-    fun getProducts(): Flow<List<Product>> {
-        return productRepository.getProductsFromFireStore().map { it.toProductModelList() }
+    fun getCategoryList(): Flow<List<Category>> {
+        return categoryRepository.getCategoriesFromFireStore().map { it.toCategoriesModel() }
+    }
+
+    fun getProducts(categories: List<Category>): Flow<List<Product>> {
+        return productRepository.getProductsFromFireStore()
+            .map { it.toProductModelList(categories) }
     }
 
     private fun getProduct(
@@ -48,7 +53,7 @@ class ProductUseCase @Inject constructor(
             ean = ean,
             price = price,
             photo = photo,
-            category = categoryValue.toFireStoreCategory()
+            idCategory = categoryValue.id
         )
     }
 }

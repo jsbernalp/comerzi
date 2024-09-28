@@ -40,7 +40,7 @@ class ProductFireStoreApi @Inject constructor(
                         it.getString("ean").orEmpty(),
                         it.getDouble("price") ?: 0.0,
                         it.getString("photo").orEmpty(),
-                        it.get("category") as Map<String, String>
+                        it.getString("idCategory").orEmpty()
                     )
                 }
             }

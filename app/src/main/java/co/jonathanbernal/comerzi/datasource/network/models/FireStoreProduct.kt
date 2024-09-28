@@ -5,7 +5,7 @@ data class FireStoreProduct(
     val ean: String,
     val price: Double,
     val photo: String,
-    val category: FireStoreCategory,
+    val idCategory: String,
 )
 
 data class FireStoreProductResponse(
@@ -14,5 +14,5 @@ data class FireStoreProductResponse(
     val ean: String,
     val price: Double,
     val photo: String,
-    val category: Map<String, String>,
+    val idCategory: String
 )

@@ -74,7 +74,7 @@ fun ProductScreen(
     navigateTo: (Unit) -> Unit
 ) {
     val productViewModel = hiltViewModel<ProductViewModel>()
-    productViewModel.getAllProducts()
+    productViewModel.getAllCategoriesAndProducts()
     Scaffold(
         modifier = Modifier
             .fillMaxSize()

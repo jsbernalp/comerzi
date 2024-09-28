@@ -4,22 +4,22 @@ import co.jonathanbernal.comerzi.datasource.network.models.FireStoreProductRespo
 import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.ui.models.Product
 
-fun List<FireStoreProductResponse>.toProductModelList(): List<Product> {
-    return this.map { it.toProductModel() }
+fun List<FireStoreProductResponse>.toProductModelList(categoryList: List<Category>): List<Product> {
+    return this.map { it.toProductModel(categoryList) }
 }
 
-fun FireStoreProductResponse.toProductModel(): Product {
+fun FireStoreProductResponse.toProductModel(categoryList: List<Category>): Product {
     return Product(
         idProduct = this.id,
         name = this.name,
         ean = this.ean,
         price = this.price,
         photo = this.photo,
-        category = this.category.toCategory()
+        category = getCategoryById(this.idCategory, categoryList)
     )
 }
 
 
-fun Map<String,String>.toCategory(): Category {
-    return Category(id = this.values.last(), name = this.values.first())
+fun getCategoryById(idCategory: String, categoryList: List<Category>): Category {
+    return categoryList.find { it.id == idCategory } ?: Category("", "")
 }

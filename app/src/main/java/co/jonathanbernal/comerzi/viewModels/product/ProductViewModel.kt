@@ -3,6 +3,7 @@ package co.jonathanbernal.comerzi.viewModels.product
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.jonathanbernal.comerzi.ui.models.Category
 import co.jonathanbernal.comerzi.ui.models.Product
 import co.jonathanbernal.comerzi.useCases.ProductUseCase
 import co.jonathanbernal.comerzi.utils.orEmpty
@@ -74,7 +75,7 @@ class ProductViewModel @Inject constructor(
                 productUseCase.deleteProduct(product.idProduct).collect { result ->
                     result.onSuccess {
                         updateProductSelected(null)
-                        getAllProducts()
+                        getAllCategoriesAndProducts()
                     }
                     result.onFailure {
                         Log.e("ProductViewModel", "Error deleting product", it)
@@ -84,13 +85,20 @@ class ProductViewModel @Inject constructor(
         }
     }
 
-    fun getAllProducts() {
+    fun getAllCategoriesAndProducts() {
         viewModelScope.launch {
-            productUseCase.getProducts().distinctUntilChanged()
-                .collect { productList ->
-                    _products.value = emptyList()
-                    _products.value = productList
+            productUseCase.getCategoryList().distinctUntilChanged()
+                .collect { categoryList ->
+                    getAllProducts(categoryList)
                 }
         }
+    }
+
+    private suspend fun getAllProducts(categoryList: List<Category>) {
+        productUseCase.getProducts(categoryList).distinctUntilChanged()
+            .collect { productList ->
+                _products.value = emptyList()
+                _products.value = productList
+            }
     }
 }
