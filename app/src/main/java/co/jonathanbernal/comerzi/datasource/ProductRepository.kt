@@ -36,10 +36,4 @@ class ProductRepository @Inject constructor(
     fun getProductsFromFireStore(): Flow<List<FireStoreProductResponse>> {
         return productFireStoreApi.getProducts()
     }
-
-    suspend fun updateCategoryList() {
-        categoryFireStoreApi.getCategories().collect { response ->
-            categoryList = response.map { it.toCategoryModel() }.toMutableList()
-        }
-    }
 }

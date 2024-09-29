@@ -1,6 +1,5 @@
 package co.jonathanbernal.comerzi.datasource.network.firestoreApi
 
-import co.jonathanbernal.comerzi.datasource.network.models.FireStoreCategoryResponse
 import co.jonathanbernal.comerzi.datasource.network.models.FireStoreProduct
 import co.jonathanbernal.comerzi.datasource.network.models.FireStoreProductResponse
 import co.jonathanbernal.comerzi.utils.snapshotFlow
