@@ -80,18 +80,18 @@ class AddProductViewModel @Inject constructor(
                     _productPrice.value.toDouble(),
                     _photo.value,
                     categoryValue
-                ).collect { result ->
-                    result.onSuccess {
+                ).fold(
+                    onSuccess = {
                         updateProductData("", FieldType.NAME)
                         updateProductData("", FieldType.EAN)
                         updateProductData("", FieldType.PRICE)
                         updateProductData(null, FieldType.CATEGORY)
                         callback.invoke(Unit)
-                    }
-                    result.onFailure {
+                    },
+                    onFailure = {
                         Log.e("AddProductViewModel", "Error adding product", it)
                     }
-                }
+                )
             }
         }
     }

@@ -21,13 +21,13 @@ class ProductUseCase @Inject constructor(
         return productRepository.deleteProductFromFireStore(idProduct)
     }
 
-    fun addProduct(
+    suspend fun addProduct(
         name: String,
         ean: String,
         price: Double,
         photo: String,
         category: Category
-    ): Flow<Result<DocumentReference>> {
+    ): Result<DocumentReference> {
         val product = getProduct(name, ean, price, photo, category)
         return productRepository.addProductToFireStore(product)
     }
