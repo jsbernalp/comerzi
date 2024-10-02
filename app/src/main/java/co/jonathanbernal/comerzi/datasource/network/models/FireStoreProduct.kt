@@ -4,7 +4,7 @@ data class FireStoreProduct(
     val name: String,
     val ean: String,
     val price: Double,
-    val photo: String,
+    var photo: String,
     val idCategory: String,
 )
 

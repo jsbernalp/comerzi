@@ -26,10 +26,16 @@ class ProductUseCase @Inject constructor(
         ean: String,
         price: Double,
         photo: String,
-        category: Category
-    ): Result<DocumentReference> {
+        category: Category,
+        onSuccess: (Flow<Result<DocumentReference>>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
         val product = getProduct(name, ean, price, photo, category)
-        return productRepository.addProductToFireStore(product)
+        return productRepository.addProductToFireStore(product, { newProduct ->
+            onSuccess(newProduct)
+        }, {
+            onError(it)
+        })
     }
 
     fun getCategoryList(): Flow<List<Category>> {

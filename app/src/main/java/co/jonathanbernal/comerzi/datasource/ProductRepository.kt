@@ -1,36 +1,47 @@
 package co.jonathanbernal.comerzi.datasource
 
-import co.jonathanbernal.comerzi.datasource.network.firestoreApi.CategoryFireStoreApi
+import android.net.Uri
 import co.jonathanbernal.comerzi.datasource.network.firestoreApi.ProductFireStoreApi
-import co.jonathanbernal.comerzi.datasource.network.mappers.toCategoryModel
 import co.jonathanbernal.comerzi.datasource.network.models.FireStoreProduct
 import co.jonathanbernal.comerzi.datasource.network.models.FireStoreProductResponse
-import co.jonathanbernal.comerzi.ui.models.Category
+import co.jonathanbernal.comerzi.datasource.storage.FirebaseStorageManager
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.single
 import javax.inject.Inject
 
 class ProductRepository @Inject constructor(
     private val productFireStoreApi: ProductFireStoreApi,
-    private val categoryFireStoreApi: CategoryFireStoreApi
+    private val firebaseStorageManager: FirebaseStorageManager
 ) {
-
-    private var categoryList = mutableListOf<Category>()
 
     fun deleteProductFromFireStore(idProduct: String): Flow<Result<Void>> {
         return productFireStoreApi.deleteProduct(idProduct)
     }
 
-    suspend fun addProductToFireStore(product: FireStoreProduct): Result<DocumentReference> {
-        val isExist: Boolean =
-            productFireStoreApi.getProduct(product.ean).map { it.isNotEmpty() }.single()
-        return if (isExist) {
-            Result.failure(Exception("Category already exists"))
-        } else {
-            productFireStoreApi.addProduct(product).single()
-        }
+    private suspend fun uploadPhotoToStorage(
+        path: String,
+        onSuccess: (String) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        firebaseStorageManager.uploadImageToStorage(path, { uri ->
+            onSuccess(uri)
+        }, { exception ->
+            onError(exception)
+        })
+    }
+
+    suspend fun addProductToFireStore(
+        product: FireStoreProduct,
+        newProduct: (Flow<Result<DocumentReference>>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        uploadPhotoToStorage(product.photo, { url ->
+            product.photo = url
+            newProduct(productFireStoreApi.addProduct(product))
+        }, { exception ->
+            onError(exception)
+        })
     }
 
     fun getProductsFromFireStore(): Flow<List<FireStoreProductResponse>> {
